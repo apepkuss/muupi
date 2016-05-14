@@ -13,20 +13,16 @@ if __name__ == "__main__":
     # load a module
     module_calculator = ModuleLoader.load_single_module(source_module_name)
 
-    tree = AST.build_ast(module_calculator)
-    print tree
-    AST.parse_ast()
-    print AST.class_nodes
-    print AST.function_nodes
+    # build ast
+    original_tree = AST.build_ast(module_calculator)
+    ast.fix_missing_locations(original_tree)
+    exec compile(original_tree, "<string>", "exec")
 
-    for node in AST.class_nodes:
-        print node[0]
+    visitor = ASTMutator()
+    mutated_tree = visitor.visit(original_tree)
+    ast.fix_missing_locations(mutated_tree)
 
-    for node in AST.function_nodes:
-        print node[0]
-
-
-
+    exec compile(mutated_tree, "<string>", "exec")
 
     # manager.setup(source_module_name, test_suite)
     # manager.perform()

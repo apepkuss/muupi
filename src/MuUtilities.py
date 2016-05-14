@@ -1,5 +1,6 @@
 import importlib
 import ast
+from MuOperators import *
 
 
 class ModuleLoader(object):
@@ -45,9 +46,7 @@ class ModuleLoader(object):
         return getattr(module, class_str)
 
 
-class AST(ast.NodeTransformer):
-    class_nodes = []
-    function_nodes = []
+class AST(object):
 
     @classmethod
     def build_ast(cls, module):
@@ -55,47 +54,111 @@ class AST(ast.NodeTransformer):
         Build an abstract syntax tree from a source file
         """
         with open(module.__file__) as module_file:
-            cls.root = ast.parse(module_file.read(), module_file.name)
-        return cls.root
+            return ast.parse(module_file.read(), module_file.name)
 
     @classmethod
-    def parse_ast(cls):
+    def mutate_ast(cls):
         """
-        Parse an existing ast tree for some interesting nodes
+        Mutate all interesting nodes on the ast of the target module
         """
-        if cls.root is None:
-            return
-        cls.dfs_ast(cls.root)
+        pass
 
     @classmethod
-    def dfs_ast(cls, node):
-        if node is None: return
-        if node.body == []: return
+    def mutate_single_node(cls, node):
+        """
+        Mutate a single interesting node on the ast of the target module
+        """
+        pass
 
-        for node in node.body:
-            if node.__class__ is ast.ClassDef:
-                # get all class nodes
-                AST.class_nodes.append((node.name, node))
-                cls.dfs_ast(node)
-            elif node.__class__ is ast.FunctionDef:
-                # get all function nodes
-                AST.function_nodes.append((node.name, node))
-                cls.dfs_ast(node)
-            else:
-                pass
 
+class ASTMutator(ast.NodeTransformer):
+
+    def __init__(self):
+        self.nodes_to_mutate = {}
+
+    def dfs_ast(func):
+        """
+        decorator to make visitor work recursive
+        """
+        def wrapper(self, node):
+            new_node = func(self, node)
+            for child in ast.iter_child_nodes(new_node):
+                self.visit(child)
+            return new_node
+
+        return wrapper
+
+    @dfs_ast
     def visit_BinOp(self, node):
+        """
+        Visit and mutate a binary operation
+        """
 
         if node.op.__class__ is ast.Add:
-            return ast.BinOp(left=node.left, op=ast.Sub(), right=node.right)
+            if ast.Add not in self.nodes_to_mutate:
+                self.nodes_to_mutate[ast.Add] = [node]
+            else:
+                self.nodes_to_mutate[ast.Add].append(node)
+
+            # mutate
+            # mutated_node = ast.BinOp(left=node.left, op=ast.Sub(), right=node.right)
+            mutated_node = self.mutate_single_node(node, ArithmeticOperatorReplacement)
+
+            # sample code: mutate Add to Subtract
+            return mutated_node
+
+        return node
+
+    def mutate_single_node(self, node, operator):
+
+        if node.__class__ is ast.BinOp and node.op.__class__ is ast.Add:
+            if operator.__name__ == 'ArithmeticOperatorReplacement':
+                return ast.BinOp(left=node.left, op=ast.Sub(), right=node.right)
+
+
+
+    @dfs_ast
+    def visit_FunctionDef(self, node):
+
+        if ast.FunctionDef not in self.nodes_to_mutate:
+            self.nodes_to_mutate[ast.FunctionDef] = [(node.name, node)]
+        else:
+            self.nodes_to_mutate[ast.FunctionDef].append((node.name, node))
+
+        return node
+
+    @dfs_ast
+    def visit_ClassDef(self, node):
+
+        if ast.ClassDef not in self.nodes_to_mutate:
+            self.nodes_to_mutate[ast.ClassDef] = [(node.name, node)]
+        else:
+            self.nodes_to_mutate[ast.ClassDef].append((node.name, node))
+
         return node
 
 
 if __name__ == "__main__":
-    tree = ast.parse("a * b")
-    # ast.fix_missing_locations(tree)
-    print ast.dump(tree)
+    source_module_name = "sample.calculator"
 
-    tree = AST().visit(tree)
+    # load a module
+    module_calculator = ModuleLoader.load_single_module(source_module_name)
+
+    # build ast
+    original_tree = AST.build_ast(module_calculator)
+    ast.fix_missing_locations(original_tree)
+    exec compile(original_tree, "<TiP>", "exec")
+
+    visitor = ASTMutator()
+    mutated_tree = visitor.visit(original_tree)
+    ast.fix_missing_locations(mutated_tree)
+
+    exec compile(mutated_tree, "<TiP>", "exec")
+
+    # tree = ast.parse("a + b")
     # ast.fix_missing_locations(tree)
-    print ast.dump(tree)
+    # print ast.dump(tree)
+    #
+    # tree = ASTMutator().visit(tree)
+    # ast.fix_missing_locations(tree)
+    # print ast.dump(tree)

@@ -25,3 +25,6 @@ class Calculator(object):
 
 def method_name():
     print 'this is a method'
+
+print Calculator.add(4, 5)
+
