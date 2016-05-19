@@ -6,26 +6,33 @@ from astdump import *
 if __name__ == "__main__":
     manager = MuManager()
 
-    source_module_name = "sample.calculator"
-
-    test_suite = None
-
     # load a module
+    source_module_name = "sample.calculator"
     module_calculator = ModuleLoader.load_single_module(source_module_name)
 
+    # build mutation operators
+    operators = ['AOR']
+    mutation_operators = MutationOperator.build(operators)
+    assert mutation_operators is not None
+
     # build ast
-    original_tree = AST.build_ast(module_calculator)
+    mutator = ASTMutator()
+
+    original_tree = mutator.parse(module_calculator)
     ast.fix_missing_locations(original_tree)
+    print "********** Original AST **********"
     exec compile(original_tree, "<string>", "exec")
 
-    visitor = ASTMutator()
-    mutated_tree = visitor.visit(original_tree)
-    ast.fix_missing_locations(mutated_tree)
+    # mutate the original tree
+    operator = None
+    for k, v in mutation_operators.iteritems():
+        if k == ast.BinOp:
+            for op in v:
+                operator = (k, op)
+                mutated_tree = mutator.mutate(operator)
+                ast.fix_missing_locations(mutated_tree)
+                print "********** Original AST **********"
+                exec compile(mutated_tree, "<string>", "exec")
 
-    exec compile(mutated_tree, "<string>", "exec")
-
-    # manager.setup(source_module_name, test_suite)
-    # manager.perform()
-    # manager.report()
-
-    print "DONE."
+            print "********** Mutation Test Done! **********"
+            break
