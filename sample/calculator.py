@@ -22,6 +22,10 @@ class Calculator(object):
         quotient = x / y  # y=0 is a bug
         return quotient
 
+    @classmethod
+    def negate(cls, x):
+        return -x
+
 
 def method_name():
     print 'this is a method'
