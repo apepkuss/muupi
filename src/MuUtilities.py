@@ -123,6 +123,22 @@ class ASTMutator(ast.NodeTransformer):
 
         return wrapper
 
+    def visit_UnaryOp(self, node):
+        """
+        Visit and mutate a unary operation
+        """
+        if node.__class__ is self.operator[0]:
+            # mutate
+            mutated_node = self.mutate_single_node(node, self.operator[1])
+            assert mutated_node is not None
+
+            # visit child nodes
+            self.dfs_visit(mutated_node)
+
+            # sample code: mutate Add to Subtract
+            return mutated_node
+        return node
+
     def visit_BinOp(self, node):
         """
         Visit and mutate a binary operation
@@ -188,22 +204,22 @@ if __name__ == "__main__":
 
     original_tree = mutator.parse(module_calculator)
     ast.fix_missing_locations(original_tree)
-    print "********** Original AST **********"
+    print "\n********** Original AST **********"
     exec compile(original_tree, "<string>", "exec")
 
     # mutate the original tree
     operator = None
     for k, v in mutation_operators.iteritems():
-        if k == ast.BinOp:
+        if k == ast.BinOp or k == ast.UnaryOp:
             for op in v:
                 operator = (k, op)
                 mutated_tree = mutator.mutate(operator)
                 ast.fix_missing_locations(mutated_tree)
-                print "********** Original AST **********"
+                print "********** Mutated AST **********"
                 exec compile(mutated_tree, "<string>", "exec")
 
-            print "********** Mutation Test Done! **********"
-            break
+            print "********** Mutation Test Done! **********\n"
+
 
 
     # # build ast
@@ -217,8 +233,8 @@ if __name__ == "__main__":
     #
     # exec compile(mutated_tree, "<TiP>", "exec")
 
-    # PART II: test code
-    # tree = ast.parse("-a")
+    # # PART II: test code
+    # tree = ast.parse("+a")
     # ast.fix_missing_locations(tree)
     # print ast.dump(tree)
     #

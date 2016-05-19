@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="74931990-c605-41a7-b107-33b2113d236a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sample/calculator.py" afterPath="$PROJECT_DIR$/sample/calculator.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Main.py" afterPath="$PROJECT_DIR$/src/Main.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/MuOperators.py" afterPath="$PROJECT_DIR$/src/MuOperators.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/MuUtilities.py" afterPath="$PROJECT_DIR$/src/MuUtilities.py" />
     </list>
     <ignored path="muupi.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -38,8 +41,8 @@
       <file leaf-file-name="Main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+            <state relative-caret-position="241">
+              <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -47,21 +50,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="calculator.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sample/calculator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="26" column="17" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="MuUtilities.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/MuUtilities.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="855">
-              <caret line="182" column="58" selection-start-line="182" selection-start-column="58" selection-end-line="182" selection-end-column="58" />
+            <state relative-caret-position="510">
+              <caret line="220" column="63" selection-start-line="192" selection-start-column="4" selection-end-line="220" selection-end-column="63" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
                 <element signature="e#156#417#0" expanded="false" />
@@ -71,10 +64,9 @@
                 <element signature="e#1603#1700#0" expanded="false" />
                 <element signature="e#1766#1867#0" expanded="false" />
                 <element signature="e#2986#3266#0" expanded="false" />
-                <element signature="e#3309#3732#0" expanded="false" />
-                <element signature="e#3782#4070#0" expanded="false" />
-                <element signature="e#4117#4396#0" expanded="false" />
-                <element signature="e#4456#4561#0" expanded="false" />
+                <element signature="e#4249#4537#0" expanded="false" />
+                <element signature="e#4584#4863#0" expanded="false" />
+                <element signature="e#4923#5028#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -83,11 +75,11 @@
       <file leaf-file-name="MuOperators.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/MuOperators.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="372">
-              <caret line="61" column="0" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
+            <state relative-caret-position="180">
+              <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
               <folding>
                 <element signature="e#959#1225#0" expanded="false" />
-                <element signature="e#2013#2679#0" expanded="false" />
+                <element signature="e#2652#3318#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -96,7 +88,7 @@
       <file leaf-file-name="astdump.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/astdump.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1290">
+            <state relative-caret-position="672">
               <caret line="87" column="85" selection-start-line="87" selection-start-column="85" selection-end-line="87" selection-end-column="85" />
               <folding />
             </state>
@@ -131,10 +123,10 @@
         <option value="$PROJECT_DIR$/src/utilities.py" />
         <option value="$PROJECT_DIR$/src/ModuleLoader.py" />
         <option value="$PROJECT_DIR$/src/Enums.py" />
+        <option value="$PROJECT_DIR$/sample/calculator.py" />
         <option value="$PROJECT_DIR$/src/MuOperators.py" />
         <option value="$PROJECT_DIR$/src/MuUtilities.py" />
         <option value="$PROJECT_DIR$/src/Main.py" />
-        <option value="$PROJECT_DIR$/sample/calculator.py" />
       </list>
     </option>
   </component>
@@ -234,7 +226,7 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.MuUtilities">
+  <component name="RunManager" selected="Python.Main">
     <configuration default="false" name="AST" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -427,8 +419,8 @@
     </list>
     <recent_temporary>
       <list size="3">
-        <item index="0" class="java.lang.String" itemvalue="Python.MuUtilities" />
-        <item index="1" class="java.lang.String" itemvalue="Python.Main" />
+        <item index="0" class="java.lang.String" itemvalue="Python.Main" />
+        <item index="1" class="java.lang.String" itemvalue="Python.MuUtilities" />
         <item index="2" class="java.lang.String" itemvalue="Python.AST" />
       </list>
     </recent_temporary>
@@ -460,7 +452,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2494043" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30273974" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4671233" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -476,9 +468,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/src/Main.py</url>
-          <line>30</line>
-          <option name="timeStamp" value="21" />
+          <url>file://$PROJECT_DIR$/src/MuUtilities.py</url>
+          <line>237</line>
+          <option name="timeStamp" value="87" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -488,13 +480,14 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="87" />
+      <option name="time" value="90" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="v" language="Python" />
-        <watch expression="self.operator[1]" language="Python" />
-        <watch expression="node.op.__class__" language="Python" />
+        <watch expression="tree" language="Python" />
+        <watch expression="mutation_operators.items()" language="Python" />
+        <watch expression="k" language="Python" />
+        <watch expression="operator" language="Python" />
       </configuration>
     </watches-manager>
   </component>
@@ -540,10 +533,9 @@
             <element signature="e#1603#1700#0" expanded="false" />
             <element signature="e#1766#1867#0" expanded="false" />
             <element signature="e#2986#3266#0" expanded="false" />
-            <element signature="e#3309#3732#0" expanded="false" />
-            <element signature="e#3782#4070#0" expanded="false" />
-            <element signature="e#4117#4396#0" expanded="false" />
-            <element signature="e#4456#4561#0" expanded="false" />
+            <element signature="e#4249#4537#0" expanded="false" />
+            <element signature="e#4584#4863#0" expanded="false" />
+            <element signature="e#4923#5028#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -562,7 +554,7 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#959#1225#0" expanded="false" />
-            <element signature="e#2013#2679#0" expanded="false" />
+            <element signature="e#2652#3318#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -608,10 +600,9 @@
             <element signature="e#1603#1700#0" expanded="false" />
             <element signature="e#1766#1867#0" expanded="false" />
             <element signature="e#2986#3266#0" expanded="false" />
-            <element signature="e#3309#3732#0" expanded="false" />
-            <element signature="e#3782#4070#0" expanded="false" />
-            <element signature="e#4117#4396#0" expanded="false" />
-            <element signature="e#4456#4561#0" expanded="false" />
+            <element signature="e#4249#4537#0" expanded="false" />
+            <element signature="e#4584#4863#0" expanded="false" />
+            <element signature="e#4923#5028#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -729,14 +720,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/astdump.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1290">
-          <caret line="87" column="85" selection-start-line="87" selection-start-column="85" selection-end-line="87" selection-end-column="85" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Enums.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
@@ -753,21 +736,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/astdump.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="672">
+          <caret line="87" column="85" selection-start-line="87" selection-start-column="85" selection-end-line="87" selection-end-column="85" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/MuOperators.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="372">
-          <caret line="61" column="0" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
+        <state relative-caret-position="180">
+          <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
           <folding>
             <element signature="e#959#1225#0" expanded="false" />
-            <element signature="e#2013#2679#0" expanded="false" />
+            <element signature="e#2652#3318#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sample/calculator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="256">
+          <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/MuUtilities.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="855">
-          <caret line="182" column="58" selection-start-line="182" selection-start-column="58" selection-end-line="182" selection-end-column="58" />
+        <state relative-caret-position="510">
+          <caret line="220" column="63" selection-start-line="192" selection-start-column="4" selection-end-line="220" selection-end-column="63" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
             <element signature="e#156#417#0" expanded="false" />
@@ -777,26 +776,17 @@
             <element signature="e#1603#1700#0" expanded="false" />
             <element signature="e#1766#1867#0" expanded="false" />
             <element signature="e#2986#3266#0" expanded="false" />
-            <element signature="e#3309#3732#0" expanded="false" />
-            <element signature="e#3782#4070#0" expanded="false" />
-            <element signature="e#4117#4396#0" expanded="false" />
-            <element signature="e#4456#4561#0" expanded="false" />
+            <element signature="e#4249#4537#0" expanded="false" />
+            <element signature="e#4584#4863#0" expanded="false" />
+            <element signature="e#4923#5028#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sample/calculator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="17" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+        <state relative-caret-position="241">
+          <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>

@@ -55,15 +55,31 @@ class ArithmeticOperatorReplacement(MutationOperator):
         mutate arithmetic addition, arithmetic subtraction
         """
 
-        if node.__class__ is not ast.BinOp: return node
+        if node.__class__ is ast.BinOp:
+            # mutate arithmetic +, -, *, /
+            if node.op.__class__ is ast.Add:
+                return ast.BinOp(left=node.left, op=ast.Sub(), right=node.right)
+            if node.op.__class__ is ast.Sub:
+                return ast.BinOp(left=node.left, op=ast.Add(), right=node.right)
+            if node.op.__class__ is ast.Mult:
+                return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
+            if node.op.__class__ is ast.Div:
+                return ast.BinOp(left=node.left, op=ast.Mult(), right=node.right)
 
-        # mutate arithmetic addition, arithmetic subtraction
-        if node.op.__class__ is ast.Add:
-            return ast.BinOp(left=node.left, op=ast.Sub(), right=node.right)
-        if node.op.__class__ is ast.Sub:
-            return ast.BinOp(left=node.left, op=ast.Add(), right=node.right)
+            # todo: try more binary operations
 
-        return node
+            return node
+
+        if node.__class__ is ast.UnaryOp:
+            if node.op.__class__ is ast.UAdd:
+                return ast.UnaryOp(op=ast.USub(), operand=node.operand)
+            if node.op.__class__ is ast.USub:
+                return ast.UnaryOp(op=ast.UAdd(), operand=node.operand)
+
+            # todo: try more unary operations
+
+            return node
+
 
 
 class AssignmentOperatorReplacement(MutationOperator):
