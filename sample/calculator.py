@@ -30,7 +30,3 @@ class Calculator(object):
 def method_name():
     print 'this is a method'
 
-print Calculator.add(4, 5)
-print Calculator.subtract(5, 4)
-print Calculator.negate(-9)
-

@@ -1,6 +1,7 @@
+import imp
 import importlib
-import ast
 from MuOperators import *
+from MuTester import *
 
 
 class ModuleLoader(object):
@@ -44,31 +45,6 @@ class ModuleLoader(object):
 
         # Finally, we retrieve the Class
         return getattr(module, class_str)
-
-
-class AST(object):
-
-    @classmethod
-    def build_ast(cls, module):
-        """
-        Build an abstract syntax tree from a source file
-        """
-        with open(module.__file__) as module_file:
-            return ast.parse(module_file.read(), module_file.name)
-
-    @classmethod
-    def mutate_ast(cls):
-        """
-        Mutate all interesting nodes on the ast of the target module
-        """
-        pass
-
-    @classmethod
-    def mutate_single_node(cls, node):
-        """
-        Mutate a single interesting node on the ast of the target module
-        """
-        pass
 
 
 class ASTMutator(ast.NodeTransformer):
@@ -157,10 +133,10 @@ class ASTMutator(ast.NodeTransformer):
 
     def visit_FunctionDef(self, node):
 
-        if ast.FunctionDef not in self.nodes_to_mutate:
-            self.nodes_to_mutate[ast.FunctionDef] = [(node.name, node)]
-        else:
-            self.nodes_to_mutate[ast.FunctionDef].append((node.name, node))
+        # if ast.FunctionDef not in self.nodes_to_mutate:
+        #     self.nodes_to_mutate[ast.FunctionDef] = [(node.name, node)]
+        # else:
+        #     self.nodes_to_mutate[ast.FunctionDef].append((node.name, node))
 
         # visit child nodes
         self.dfs_visit(node)
@@ -169,10 +145,10 @@ class ASTMutator(ast.NodeTransformer):
 
     def visit_ClassDef(self, node):
 
-        if ast.ClassDef not in self.nodes_to_mutate:
-            self.nodes_to_mutate[ast.ClassDef] = [(node.name, node)]
-        else:
-            self.nodes_to_mutate[ast.ClassDef].append((node.name, node))
+        # if ast.ClassDef not in self.nodes_to_mutate:
+        #     self.nodes_to_mutate[ast.ClassDef] = [(node.name, node)]
+        # else:
+        #     self.nodes_to_mutate[ast.ClassDef].append((node.name, node))
 
         # visit child nodes
         self.dfs_visit(node)
@@ -184,6 +160,16 @@ class ASTMutator(ast.NodeTransformer):
         Mutate a single node by a specified operator
         """
         return operator.mutate(node)
+
+
+def generate_mutant_module(mutated_ast, mutant_file_name, mutant_module_name):
+    """
+    generate a mutant module from a mutated ast
+    """
+    mutant_code = compile(mutated_ast, mutant_file_name, "exec")
+    mutant_module = imp.new_module(mutant_module_name)
+    exec mutant_code in mutant_module.__dict__
+    return mutant_module
 
 
 if __name__ == "__main__":

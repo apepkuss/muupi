@@ -2,9 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="74931990-c605-41a7-b107-33b2113d236a" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sample/unittest_calculator.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/codegen.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sample/calculator.py" afterPath="$PROJECT_DIR$/sample/calculator.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Main.py" afterPath="$PROJECT_DIR$/src/Main.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/MuOperators.py" afterPath="$PROJECT_DIR$/src/MuOperators.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/MuTester.py" afterPath="$PROJECT_DIR$/src/MuTester.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/MuUtilities.py" afterPath="$PROJECT_DIR$/src/MuUtilities.py" />
     </list>
     <ignored path="muupi.iws" />
@@ -26,23 +30,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="MuManager.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/MuManager.py">
+      <file leaf-file-name="unittest_calculator.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sample/unittest_calculator.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="21" column="49" selection-start-line="21" selection-start-column="49" selection-end-line="21" selection-end-column="49" />
+            <state relative-caret-position="495">
+              <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
               <folding>
-                <element signature="e#0#24#0" expanded="true" />
+                <element signature="e#0#15#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Main.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="241">
-              <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
+            <state relative-caret-position="211">
+              <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -53,44 +57,34 @@
       <file leaf-file-name="MuUtilities.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/MuUtilities.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
-              <caret line="220" column="63" selection-start-line="192" selection-start-column="4" selection-end-line="220" selection-end-column="63" />
+            <state relative-caret-position="15">
+              <caret line="1" column="16" selection-start-line="1" selection-start-column="16" selection-end-line="1" selection-end-column="16" />
               <folding>
-                <element signature="e#0#16#0" expanded="true" />
-                <element signature="e#156#417#0" expanded="false" />
-                <element signature="e#495#724#0" expanded="false" />
-                <element signature="e#802#1281#0" expanded="false" />
-                <element signature="e#1361#1551#0" expanded="false" />
-                <element signature="e#1603#1700#0" expanded="false" />
-                <element signature="e#1766#1867#0" expanded="false" />
-                <element signature="e#2986#3266#0" expanded="false" />
-                <element signature="e#4249#4537#0" expanded="false" />
-                <element signature="e#4584#4863#0" expanded="false" />
-                <element signature="e#4923#5028#0" expanded="false" />
+                <element signature="e#179#440#0" expanded="false" />
+                <element signature="e#825#1304#0" expanded="false" />
+                <element signature="e#1351#4481#0" expanded="false" />
+                <element signature="e#1637#1945#0" expanded="false" />
+                <element signature="e#1987#2224#0" expanded="false" />
+                <element signature="e#2265#2364#0" expanded="false" />
+                <element signature="e#2423#2703#0" expanded="false" />
+                <element signature="e#2748#3170#0" expanded="false" />
+                <element signature="e#3213#3636#0" expanded="false" />
+                <element signature="e#3686#3982#0" expanded="false" />
+                <element signature="e#4029#4316#0" expanded="false" />
+                <element signature="e#4376#4481#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MuOperators.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/MuOperators.py">
+      <file leaf-file-name="MuTester.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/MuTester.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
+            <state relative-caret-position="225">
+              <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
               <folding>
-                <element signature="e#959#1225#0" expanded="false" />
-                <element signature="e#2652#3318#0" expanded="false" />
+                <element signature="e#0#15#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="astdump.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/astdump.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="672">
-              <caret line="87" column="85" selection-start-line="87" selection-start-column="85" selection-end-line="87" selection-end-column="85" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -114,7 +108,6 @@
         <option value="$PROJECT_DIR$/muupi/MuManager.py" />
         <option value="$PROJECT_DIR$/src/AST.py" />
         <option value="$PROJECT_DIR$/src/__init__.py" />
-        <option value="$PROJECT_DIR$/src/MuTester.py" />
         <option value="$PROJECT_DIR$/src/MutantGenerator.py" />
         <option value="$PROJECT_DIR$/src/MuAnalyzer.py" />
         <option value="$PROJECT_DIR$/samples/sample_addition.py" />
@@ -123,10 +116,12 @@
         <option value="$PROJECT_DIR$/src/utilities.py" />
         <option value="$PROJECT_DIR$/src/ModuleLoader.py" />
         <option value="$PROJECT_DIR$/src/Enums.py" />
-        <option value="$PROJECT_DIR$/sample/calculator.py" />
         <option value="$PROJECT_DIR$/src/MuOperators.py" />
+        <option value="$PROJECT_DIR$/sample/calculator.py" />
+        <option value="$PROJECT_DIR$/sample/unittest_calculator.py" />
         <option value="$PROJECT_DIR$/src/MuUtilities.py" />
         <option value="$PROJECT_DIR$/src/Main.py" />
+        <option value="$PROJECT_DIR$/src/MuTester.py" />
       </list>
     </option>
   </component>
@@ -218,12 +213,12 @@
     <property name="FullScreen" value="true" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src" />
       <recent name="$PROJECT_DIR$/sample" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
   <component name="RunManager" selected="Python.Main">
@@ -274,6 +269,40 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="muupi" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/MuUtilities.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="unittest_calculator" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sample" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="muupi" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sample/unittest_calculator.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="MuTester" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="muupi" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/MuTester.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -412,21 +441,28 @@
       <option name="USE_KEYWORD" value="false" />
       <method />
     </configuration>
-    <list size="3">
+    <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.AST" />
       <item index="1" class="java.lang.String" itemvalue="Python.Main" />
       <item index="2" class="java.lang.String" itemvalue="Python.MuUtilities" />
+      <item index="3" class="java.lang.String" itemvalue="Python.unittest_calculator" />
+      <item index="4" class="java.lang.String" itemvalue="Python.MuTester" />
     </list>
     <recent_temporary>
-      <list size="3">
+      <list size="5">
         <item index="0" class="java.lang.String" itemvalue="Python.Main" />
         <item index="1" class="java.lang.String" itemvalue="Python.MuUtilities" />
-        <item index="2" class="java.lang.String" itemvalue="Python.AST" />
+        <item index="2" class="java.lang.String" itemvalue="Python.MuTester" />
+        <item index="3" class="java.lang.String" itemvalue="Python.unittest_calculator" />
+        <item index="4" class="java.lang.String" itemvalue="Python.AST" />
       </list>
     </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -445,14 +481,14 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2494043" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32786885" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329235" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2494043" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4671233" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4671233" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -460,6 +496,14 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -469,8 +513,33 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/src/MuUtilities.py</url>
-          <line>237</line>
+          <line>223</line>
           <option name="timeStamp" value="87" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/src/MuTester.py</url>
+          <line>29</line>
+          <option name="timeStamp" value="100" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/src/MuTester.py</url>
+          <line>18</line>
+          <option name="timeStamp" value="104" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/src/Main.py</url>
+          <line>52</line>
+          <option name="timeStamp" value="106" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/src/MuTester.py</url>
+          <line>14</line>
+          <option name="timeStamp" value="108" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/src/Main.py</url>
+          <line>51</line>
+          <option name="timeStamp" value="109" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -480,14 +549,17 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="90" />
+      <option name="time" value="111" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="tree" language="Python" />
-        <watch expression="mutation_operators.items()" language="Python" />
-        <watch expression="k" language="Python" />
-        <watch expression="operator" language="Python" />
+        <watch expression="getattr(module_to_test, 'name')" language="Python" />
+        <watch expression="hasattr(module_to_test, '__name__')" language="Python" />
+        <watch expression="module_to_test" language="Python" />
+        <watch expression="mutant_module" language="Python" />
+        <watch expression="code" language="Python" />
+        <watch expression="sys.modules" language="Python" />
+        <watch expression="'calculator' in sys.modules" language="Python" />
       </configuration>
     </watches-manager>
   </component>
@@ -498,63 +570,54 @@
           <caret line="21" column="49" selection-start-line="21" selection-start-column="49" selection-end-line="21" selection-end-column="49" />
           <folding>
             <element signature="e#0#24#0" expanded="true" />
+            <element signature="e#138#275#0" expanded="false" />
+            <element signature="e#333#605#0" expanded="false" />
+            <element signature="e#638#1326#0" expanded="false" />
+            <element signature="e#1358#1496#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" column="50" selection-start-line="24" selection-start-column="50" selection-end-line="24" selection-end-column="50" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sample/calculator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/MuUtilities.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="945">
-          <caret line="107" column="0" selection-start-line="107" selection-start-column="0" selection-end-line="107" selection-end-column="0" />
+        <state relative-caret-position="2130">
+          <caret line="220" column="63" selection-start-line="192" selection-start-column="4" selection-end-line="220" selection-end-column="63" />
           <folding>
-            <element signature="e#0#16#0" expanded="true" />
-            <element signature="e#156#417#0" expanded="false" />
-            <element signature="e#495#724#0" expanded="false" />
-            <element signature="e#802#1281#0" expanded="false" />
-            <element signature="e#1361#1551#0" expanded="false" />
-            <element signature="e#1603#1700#0" expanded="false" />
-            <element signature="e#1766#1867#0" expanded="false" />
-            <element signature="e#2986#3266#0" expanded="false" />
-            <element signature="e#4249#4537#0" expanded="false" />
-            <element signature="e#4584#4863#0" expanded="false" />
-            <element signature="e#4923#5028#0" expanded="false" />
+            <element signature="e#179#440#0" expanded="false" />
+            <element signature="e#825#1304#0" expanded="false" />
+            <element signature="e#1351#4481#0" expanded="false" />
+            <element signature="e#1637#1945#0" expanded="false" />
+            <element signature="e#1987#2224#0" expanded="false" />
+            <element signature="e#2265#2364#0" expanded="false" />
+            <element signature="e#2423#2703#0" expanded="false" />
+            <element signature="e#2748#3170#0" expanded="false" />
+            <element signature="e#3213#3636#0" expanded="false" />
+            <element signature="e#3686#3982#0" expanded="false" />
+            <element signature="e#4029#4316#0" expanded="false" />
+            <element signature="e#4376#4481#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/python2.7/ast.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2640">
-          <caret line="177" column="0" selection-start-line="177" selection-start-column="0" selection-end-line="177" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/MuOperators.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="930">
+          <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
           <folding>
+            <element signature="e#164#793#0" expanded="false" />
             <element signature="e#959#1225#0" expanded="false" />
-            <element signature="e#2652#3318#0" expanded="false" />
+            <element signature="e#1394#2482#0" expanded="false" />
+            <element signature="e#2651#3317#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -573,6 +636,94 @@
           <caret line="21" column="49" selection-start-line="21" selection-start-column="49" selection-end-line="21" selection-end-column="49" />
           <folding>
             <element signature="e#0#24#0" expanded="true" />
+            <element signature="e#138#275#0" expanded="false" />
+            <element signature="e#333#605#0" expanded="false" />
+            <element signature="e#638#1326#0" expanded="false" />
+            <element signature="e#1358#1496#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="50" selection-start-line="24" selection-start-column="50" selection-end-line="24" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sample/calculator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+          <folding>
+            <element signature="e#33#460#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MuUtilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="945">
+          <caret line="107" column="0" selection-start-line="107" selection-start-column="0" selection-end-line="107" selection-end-column="0" />
+          <folding>
+            <element signature="e#179#440#0" expanded="false" />
+            <element signature="e#825#1304#0" expanded="false" />
+            <element signature="e#1351#4481#0" expanded="false" />
+            <element signature="e#1637#1945#0" expanded="false" />
+            <element signature="e#1987#2224#0" expanded="false" />
+            <element signature="e#2265#2364#0" expanded="false" />
+            <element signature="e#2423#2703#0" expanded="false" />
+            <element signature="e#2748#3170#0" expanded="false" />
+            <element signature="e#3213#3636#0" expanded="false" />
+            <element signature="e#3686#3982#0" expanded="false" />
+            <element signature="e#4029#4316#0" expanded="false" />
+            <element signature="e#4376#4481#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/python2.7/ast.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2640">
+          <caret line="177" column="0" selection-start-line="177" selection-start-column="0" selection-end-line="177" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MuOperators.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#164#793#0" expanded="false" />
+            <element signature="e#959#1225#0" expanded="false" />
+            <element signature="e#1394#2482#0" expanded="false" />
+            <element signature="e#2651#3317#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/astdump.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1290">
+          <caret line="87" column="85" selection-start-line="87" selection-start-column="85" selection-end-line="87" selection-end-column="85" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MuManager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="21" column="49" selection-start-line="21" selection-start-column="49" selection-end-line="21" selection-end-column="49" />
+          <folding>
+            <element signature="e#0#24#0" expanded="true" />
+            <element signature="e#138#275#0" expanded="false" />
+            <element signature="e#333#605#0" expanded="false" />
+            <element signature="e#638#1326#0" expanded="false" />
+            <element signature="e#1358#1496#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -592,17 +743,18 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#16#0" expanded="true" />
-            <element signature="e#156#417#0" expanded="false" />
-            <element signature="e#495#724#0" expanded="false" />
-            <element signature="e#802#1281#0" expanded="false" />
-            <element signature="e#1361#1551#0" expanded="false" />
-            <element signature="e#1603#1700#0" expanded="false" />
-            <element signature="e#1766#1867#0" expanded="false" />
-            <element signature="e#2986#3266#0" expanded="false" />
-            <element signature="e#4249#4537#0" expanded="false" />
-            <element signature="e#4584#4863#0" expanded="false" />
-            <element signature="e#4923#5028#0" expanded="false" />
+            <element signature="e#179#440#0" expanded="false" />
+            <element signature="e#825#1304#0" expanded="false" />
+            <element signature="e#1351#4481#0" expanded="false" />
+            <element signature="e#1637#1945#0" expanded="false" />
+            <element signature="e#1987#2224#0" expanded="false" />
+            <element signature="e#2265#2364#0" expanded="false" />
+            <element signature="e#2423#2703#0" expanded="false" />
+            <element signature="e#2748#3170#0" expanded="false" />
+            <element signature="e#3213#3636#0" expanded="false" />
+            <element signature="e#3686#3982#0" expanded="false" />
+            <element signature="e#4029#4316#0" expanded="false" />
+            <element signature="e#4376#4481#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -621,6 +773,10 @@
           <caret line="49" column="30" selection-start-line="49" selection-start-column="30" selection-end-line="49" selection-end-column="30" />
           <folding>
             <element signature="e#0#24#0" expanded="true" />
+            <element signature="e#138#275#0" expanded="false" />
+            <element signature="e#333#605#0" expanded="false" />
+            <element signature="e#638#1326#0" expanded="false" />
+            <element signature="e#1358#1496#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -674,13 +830,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/MuTester.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="12" selection-start-line="15" selection-start-column="12" selection-end-line="15" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/MuAnalyzer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -710,24 +859,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/MuManager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="21" column="49" selection-start-line="21" selection-start-column="49" selection-end-line="21" selection-end-column="49" />
-          <folding>
-            <element signature="e#0#24#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Enums.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Enums.py" />
     <entry file="file:///usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/python2.7/ast.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="108">
@@ -738,57 +870,112 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/astdump.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="672">
+        <state relative-caret-position="1290">
           <caret line="87" column="85" selection-start-line="87" selection-start-column="85" selection-end-line="87" selection-end-column="85" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MuManager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="14" column="47" selection-start-line="14" selection-start-column="47" selection-end-line="14" selection-end-column="47" />
+          <folding>
+            <element signature="e#0#24#0" expanded="true" />
+            <element signature="e#138#275#0" expanded="false" />
+            <element signature="e#333#605#0" expanded="false" />
+            <element signature="e#638#1326#0" expanded="false" />
+            <element signature="e#1358#1496#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/design/muupi_design.mdj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="2786" column="29" selection-start-line="2786" selection-start-column="29" selection-end-line="2786" selection-end-column="29" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/MuOperators.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
+        <state relative-caret-position="480">
+          <caret line="82" column="0" selection-start-line="82" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
           <folding>
+            <element signature="e#164#793#0" expanded="false" />
             <element signature="e#959#1225#0" expanded="false" />
-            <element signature="e#2652#3318#0" expanded="false" />
+            <element signature="e#1394#2482#0" expanded="false" />
+            <element signature="e#2651#3317#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sample/calculator.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
+        <state relative-caret-position="30">
+          <caret line="2" column="25" selection-start-line="2" selection-start-column="25" selection-end-line="2" selection-end-column="25" />
+          <folding>
+            <element signature="e#33#460#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sample/unittest_calculator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="495">
+          <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/codegen.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/MuUtilities.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="220" column="63" selection-start-line="192" selection-start-column="4" selection-end-line="220" selection-end-column="63" />
+        <state relative-caret-position="15">
+          <caret line="1" column="16" selection-start-line="1" selection-start-column="16" selection-end-line="1" selection-end-column="16" />
           <folding>
-            <element signature="e#0#16#0" expanded="true" />
-            <element signature="e#156#417#0" expanded="false" />
-            <element signature="e#495#724#0" expanded="false" />
-            <element signature="e#802#1281#0" expanded="false" />
-            <element signature="e#1361#1551#0" expanded="false" />
-            <element signature="e#1603#1700#0" expanded="false" />
-            <element signature="e#1766#1867#0" expanded="false" />
-            <element signature="e#2986#3266#0" expanded="false" />
-            <element signature="e#4249#4537#0" expanded="false" />
-            <element signature="e#4584#4863#0" expanded="false" />
-            <element signature="e#4923#5028#0" expanded="false" />
+            <element signature="e#179#440#0" expanded="false" />
+            <element signature="e#825#1304#0" expanded="false" />
+            <element signature="e#1351#4481#0" expanded="false" />
+            <element signature="e#1637#1945#0" expanded="false" />
+            <element signature="e#1987#2224#0" expanded="false" />
+            <element signature="e#2265#2364#0" expanded="false" />
+            <element signature="e#2423#2703#0" expanded="false" />
+            <element signature="e#2748#3170#0" expanded="false" />
+            <element signature="e#3213#3636#0" expanded="false" />
+            <element signature="e#3686#3982#0" expanded="false" />
+            <element signature="e#4029#4316#0" expanded="false" />
+            <element signature="e#4376#4481#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="241">
-          <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
+        <state relative-caret-position="211">
+          <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MuTester.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>

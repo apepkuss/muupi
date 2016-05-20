@@ -81,7 +81,6 @@ class ArithmeticOperatorReplacement(MutationOperator):
             return node
 
 
-
 class AssignmentOperatorReplacement(MutationOperator):
 
     @classmethod
