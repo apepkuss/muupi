@@ -27,6 +27,13 @@ class Calculator(object):
         return -x
 
 
+class CalculatorTest(object):
+
+    @classmethod
+    def test(cls):
+        pass
+
+
 def method_name():
     print 'this is a method'
 
