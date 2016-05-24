@@ -29,6 +29,12 @@ class CalculatorTestCases(unittest.TestCase):
         operand = 9
         self.assertEqual(self.sut.negate(operand), -operand, "Incorrect Calculator.negate.")
 
+    def test_floorDiv(self):
+        operand1, operand2 = 5, 2
+        self.assertEqual(self.sut.floorDiv(operand1, operand2), 2, "Incorrect Calculator.floorDiv")
+
     def tearDown(self):
         pass
 
+if __name__ == "__main__":
+    unittest.main()

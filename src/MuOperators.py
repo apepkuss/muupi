@@ -65,6 +65,8 @@ class ArithmeticOperatorReplacement(MutationOperator):
                 return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
             if node.op.__class__ is ast.Div:
                 return ast.BinOp(left=node.left, op=ast.Mult(), right=node.right)
+            if node.op.__class__ is ast.FloorDiv:
+                return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
 
             # todo: try more binary operations
 

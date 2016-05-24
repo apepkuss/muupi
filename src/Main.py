@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # todo: do further analysis on the test result
 
     # build mutation operators
-    operators = ['AOR']
+    operators = ['AOD', 'AOR', 'ASR']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
@@ -42,6 +42,7 @@ if __name__ == "__main__":
     print "********** Run test suite on mutants **********"
     # mutate the original tree
     operator = None
+    mutator_dict = {}
     for k, v in mutation_operators.iteritems():
         if k == ast.BinOp or k == ast.UnaryOp:
             for op in v:

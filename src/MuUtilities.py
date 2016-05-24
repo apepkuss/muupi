@@ -65,7 +65,12 @@ class ASTMutator(ast.NodeTransformer):
         Return an AST tree
         """
         with open(module.__file__) as module_file:
-            self.original_ast = ast.parse(module_file.read(), module_file.name)
+            try:
+                code = module_file.read()
+                self.original_ast = ast.parse(code, module_file.name)
+            except TypeError:
+                # remove the pyc file of sut if raise a TypeError exception
+                pass
         assert self.original_ast is not None
         return self.original_ast
 
@@ -178,35 +183,62 @@ if __name__ == "__main__":
 
     # PART I: test code
 
-    # load a module
-    source_module_name = "sample.calculator"
-    module_calculator = ModuleLoader.load_single_module(source_module_name)
+    # load the module to mutate
+    source_module_fullname = "sample.calculator"
+    source_module_shortname = "calculator"
+    source_module = ModuleLoader.load_single_module(source_module_fullname)
+
+    # load the test module
+    suite_module_name = "sample.unittest_calculator"
+    suite_module = ModuleLoader.load_single_module(suite_module_name)
+
+    # create an instance of MuTester
+    tester = MuTester(suite_module)
+
+    print "********** Run test suite on source file **********"
+
+    # run a unit test suite on original sut
+    test_result = tester.run()
+
+    # todo: do further analysis on the test result
 
     # build mutation operators
-    operators = ['AOR']
+    operators = ['AOD', 'AOR', 'ASR']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
     # build ast
     mutator = ASTMutator()
 
-    original_tree = mutator.parse(module_calculator)
+    original_tree = mutator.parse(source_module)
     ast.fix_missing_locations(original_tree)
-    print "\n********** Original AST **********"
-    exec compile(original_tree, "<string>", "exec")
 
+    print "********** Run test suite on mutants **********"
     # mutate the original tree
     operator = None
+    mutator_dict = {}
     for k, v in mutation_operators.iteritems():
-        if k == ast.BinOp or k == ast.UnaryOp:
+        if k == ast.BinOp:  # or k == ast.UnaryOp:
             for op in v:
+                # mutate the original sut
                 operator = (k, op)
                 mutated_tree = mutator.mutate(operator)
                 ast.fix_missing_locations(mutated_tree)
-                print "********** Mutated AST **********"
-                exec compile(mutated_tree, "<string>", "exec")
+
+                # generate a mutant module from mutated ast tree
+                mutant_module = generate_mutant_module(mutated_tree, source_module_shortname)
+
+                # remove the source module from sys.modules
+                # del sys.modules[source_module_fullname]
+
+                if tester.update_suite(source_module, mutant_module):
+                    test_result = tester.run()
+
+                    # todo: do further analaysis on test result
 
             print "********** Mutation Test Done! **********\n"
+
+        break
 
 
 
