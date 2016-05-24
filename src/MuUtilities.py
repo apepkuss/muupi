@@ -162,17 +162,16 @@ class ASTMutator(ast.NodeTransformer):
         return operator.mutate(node)
 
 
-def generate_mutant_module(mutated_ast, mutant_file_name, mutant_module_name):
+def generate_mutant_module(mutated_ast, module_shortname):
     """
     generate a mutant module from a mutated ast
     """
-    mutant_code = compile(mutated_ast, mutant_file_name, "exec")
-    mutant_module = imp.new_module(mutant_module_name)
+    prefix = "mutant_"
+    mutant_module_shortname = prefix + module_shortname
+    mutant_code = compile(mutated_ast, mutant_module_shortname, "exec")
+    mutant_module = imp.new_module(mutant_module_shortname)
     exec mutant_code in mutant_module.__dict__
     return mutant_module
-
-
-
 
 
 if __name__ == "__main__":

@@ -3,14 +3,30 @@ from MuUtilities import *
 from astdump import *
 import codegen
 import imp
+import sys
 
 
 if __name__ == "__main__":
     manager = MuManager()
 
     # load the module to mutate
-    source_module_name = "sample.calculator"
-    module_calculator = ModuleLoader.load_single_module(source_module_name)
+    source_module_fullname = "sample.calculator"
+    source_module_shortname = "calculator"
+    source_module = ModuleLoader.load_single_module(source_module_fullname)
+
+    # load the test module
+    suite_module_name = "sample.unittest_calculator"
+    suite_module = ModuleLoader.load_single_module(suite_module_name)
+
+    # create an instance of MuTester
+    tester = MuTester(suite_module)
+
+    print "********** Run test suite on source file **********"
+
+    # run a unit test suite on original sut
+    test_result = tester.run()
+
+    # todo: do further analysis on the test result
 
     # build mutation operators
     operators = ['AOR']
@@ -20,40 +36,31 @@ if __name__ == "__main__":
     # build ast
     mutator = ASTMutator()
 
-    original_tree = mutator.parse(module_calculator)
+    original_tree = mutator.parse(source_module)
     ast.fix_missing_locations(original_tree)
-    print "\n********** Original AST **********"
-    exec compile(original_tree, "<string>", "exec")
 
+    print "********** Run test suite on mutants **********"
     # mutate the original tree
     operator = None
     for k, v in mutation_operators.iteritems():
         if k == ast.BinOp or k == ast.UnaryOp:
             for op in v:
+                # mutate the original sut
                 operator = (k, op)
                 mutated_tree = mutator.mutate(operator)
                 ast.fix_missing_locations(mutated_tree)
-                print "********** Mutated AST **********"
 
-                # # generate a mutant module from mutated ast tree
-                # mutant_file_name = "calculator"
-                # mutant_module_name = "calculator"
-                # mutant_module = generate_mutant_module(mutated_tree, mutant_file_name, mutant_module_name)
-                #
-                # # prepare test suite
-                # sys.meta_path.insert(0, CustomImporter(mutant_module))
+                # generate a mutant module from mutated ast tree
+                mutant_module = generate_mutant_module(mutated_tree, source_module_shortname)
 
-                # load the test module
-                suite_module_name = "sample.unittest_calculator"
-                suite_module = ModuleLoader.load_single_module(suite_module_name)
+                # remove the source module from sys.modules
+                # del sys.modules[source_module_fullname]
 
-                # run test suite
-                test_result = MuTester.run(suite_module=suite_module, module_to_test=module_calculator)
+                if tester.update_suite(source_module, mutant_module):
+                    test_result = tester.run()
 
-                # todo:
-                # mutated_source_code = codegen.to_source(mutated_tree)
-                # print mutated_source_code
-
-                print "test"
+                    # todo: do further analaysis on test result
 
             print "********** Mutation Test Done! **********\n"
+
+        break
