@@ -26,6 +26,11 @@ class Calculator(object):
     def negate(cls, x):
         return -x
 
+    @classmethod
+    def floorDiv(cls, x, y):
+        quotient = x // y
+        return quotient
+
 
 class CalculatorTest(object):
 
@@ -36,4 +41,8 @@ class CalculatorTest(object):
 
 def method_name():
     print 'this is a method'
+
+if __name__ == "__main__":
+    res = Calculator.floorDiv(5, 2)
+    print res
 
