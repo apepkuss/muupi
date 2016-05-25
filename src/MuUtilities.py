@@ -157,6 +157,22 @@ class ASTMutator(ast.NodeTransformer):
             return mutated_node
         return node
 
+    def visit_Assign(self, node):
+
+        if node.__class__ is self.operator[0]:
+            mutated_node = None
+            for operator_class in self.operator[1]:
+                # mutate
+                mutated_node = self.mutate_single_node(node, operator_class)
+                if mutated_node is not None:
+                    break
+
+            if mutated_node is not None:
+                # visit child nodes
+                self.dfs_visit(node)
+
+        return node
+
     def visit_For(self, node):
 
         # visit child nodes
@@ -246,7 +262,7 @@ if __name__ == "__main__":
     operator = None
     mutator_dict = {}
     for k, v in mutation_operators.iteritems():
-        if k == ast.BinOp:  # or k == ast.UnaryOp:
+        if k == ast.Assign:  # or k == ast.UnaryOp:
             for op in v:
                 operator = (k, op)
 

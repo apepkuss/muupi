@@ -39,12 +39,12 @@ class Calculator(object):
     @classmethod
     def sum_all(cls, nums):
         n = len(nums)
-        if not(n == 0):
+        if not(n > 0):  # test COD
             return 0
 
-        res = 0
+        res = 0  # test CRP for numeric literals
         for i in xrange(n):
-            if nums[i] == 0:
+            if nums[i] == 0:  # test COI
                 continue
             res += nums[i]
         return res

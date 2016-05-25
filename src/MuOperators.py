@@ -64,6 +64,12 @@ class MutationOperator(object):
                 else:
                     cls.mutation_operators[ast.If].append(ConditionalOperatorInsertion)
 
+            if name == 'CRP':
+                if ast.Assign not in cls.mutation_operators:
+                    cls.mutation_operators[ast.Assign] = [ConstantReplacement]
+                else:
+                    cls.mutation_operators[ast.Assign].append(ConstantReplacement)
+
         return cls.mutation_operators
 
 
@@ -231,8 +237,6 @@ class ConditionalOperatorInsertion(MutationOperator):
         return None
 
 
-
-
 class ConstantReplacement(MutationOperator):
     @classmethod
     def name(cls):
@@ -240,7 +244,13 @@ class ConstantReplacement(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        pass
+
+        if node.__class__ is ast.Assign and node.value.__class__ is ast.Num:
+            if hasattr(node.value, 'n'):
+                original_value = getattr(node.value, 'n')
+                setattr(node.value, 'n', original_value+1)
+                return node
+        return None
 
 
 class DecoratorDeletion(MutationOperator):
@@ -450,7 +460,7 @@ if __name__ == "__main__":
     source_module = ModuleLoader.load_single_module(source_module_fullname)
 
     # build mutation operators
-    operators = ['COD', 'COI']
+    operators = ['CRP']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
@@ -464,7 +474,7 @@ if __name__ == "__main__":
     operator = None
     mutator_dict = {}
     for operator in mutation_operators.iteritems():
-        if operator[0] == ast.If:  # or k == ast.UnaryOp:
+        if operator[0] == ast.Assign:  # or k == ast.UnaryOp:
 
             # mutate the original sut
             mutated_tree = mutator.mutate(operator)
