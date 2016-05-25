@@ -142,25 +142,19 @@ class ASTMutator(ast.NodeTransformer):
         :param node:
         :return:
         """
-        if node.__class__ is self.operator[0] and node.test.__class__ is ast.Compare:
-            # # mutate
-            # mutated_node = self.mutate_single_node(node, self.operator[1])
-            # assert mutated_node is not None
-            #
-            # # visit child nodes
-            # self.dfs_visit(mutated_node)
-            #
-            # return mutated_node
-            unary_op_node = ast.UnaryOp()
-            unary_op_node.op = ast.Not()
-            unary_op_node.operand = node.test
-            unary_op_node.lineno = node.test.lineno
-            unary_op_node.col_offset = node.test.col_offset
-            node.test = unary_op_node
+        if node.__class__ is self.operator[0]:
+
+            for operator_class in self.operator[1]:
+                # mutate
+                mutated_node = self.mutate_single_node(node, operator_class)
+                if mutated_node is not None:
+                    break
+            assert mutated_node is not None
 
             # visit child nodes
-            self.dfs_visit(node)
+            self.dfs_visit(mutated_node)
 
+            return mutated_node
         return node
 
     def visit_For(self, node):

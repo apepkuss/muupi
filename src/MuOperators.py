@@ -24,7 +24,7 @@ class MutationOperator(object):
                 else:
                     cls.mutation_operators[ast.UnaryOp].append(ArithmeticOperatorDeletion)
 
-            elif name == 'AOR':
+            if name == 'AOR':
                 if ast.UnaryOp not in cls.mutation_operators:
                     cls.mutation_operators[ast.UnaryOp] = [ArithmeticOperatorReplacement]
                 else:
@@ -35,13 +35,13 @@ class MutationOperator(object):
                 else:
                     cls.mutation_operators[ast.BinOp].append(ArithmeticOperatorReplacement)
 
-            elif name == 'ASR':
+            if name == 'ASR':
                 if ast.AugAssign not in cls.mutation_operators:
                     cls.mutation_operators[ast.AugAssign] = [AssignmentOperatorReplacement]
                 else:
                     cls.mutation_operators[ast.AugAssign].append(AssignmentOperatorReplacement)
 
-            elif name == 'BCR':
+            if name == 'BCR':
                 if ast.Break not in cls.mutation_operators:
                     cls.mutation_operators[ast.Break] = [BreakContinueReplacement]
                 else:
@@ -52,8 +52,14 @@ class MutationOperator(object):
                 else:
                     cls.mutation_operators[ast.Continue].append(BreakContinueReplacement)
 
-            elif name == 'COI':
-                if ast.IfExp not in cls.mutation_operators:
+            if name == 'COD':
+                if ast.If not in cls.mutation_operators:
+                    cls.mutation_operators[ast.If] = [ConditionalOperatorDeletion]
+                else:
+                    cls.mutation_operators[ast.If].append(ConditionalOperatorDeletion)
+
+            if name == 'COI':
+                if ast.If not in cls.mutation_operators:
                     cls.mutation_operators[ast.If] = [ConditionalOperatorInsertion]
                 else:
                     cls.mutation_operators[ast.If].append(ConditionalOperatorInsertion)
@@ -200,8 +206,10 @@ class ConditionalOperatorDeletion(MutationOperator):
         """
         remove bitwise invert operator: ~
         """
-        if node.op.__class__ is ast.Not:
-            return node.operand
+        if node.__class__ is ast.If and node.test.__class__ is ast.UnaryOp and node.test.op.__class__ is ast.Not:
+            node.test = node.test.operand
+            return node
+        return None
 
 
 class ConditionalOperatorInsertion(MutationOperator):
@@ -212,8 +220,15 @@ class ConditionalOperatorInsertion(MutationOperator):
     @classmethod
     def mutate(cls, node):
 
-        if node.__class__ == ast.If:
-            pass
+        if node.__class__ is ast.If and node.test.__class__ is ast.Compare:
+            unary_op_node = ast.UnaryOp()
+            unary_op_node.op = ast.Not()
+            unary_op_node.operand = node.test
+            unary_op_node.lineno = node.test.lineno
+            unary_op_node.col_offset = node.test.col_offset
+            node.test = unary_op_node
+            return node
+        return None
 
 
 
@@ -435,7 +450,7 @@ if __name__ == "__main__":
     source_module = ModuleLoader.load_single_module(source_module_fullname)
 
     # build mutation operators
-    operators = ['COI']
+    operators = ['COD', 'COI']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
@@ -448,18 +463,16 @@ if __name__ == "__main__":
     # mutate the original tree
     operator = None
     mutator_dict = {}
-    for k, v in mutation_operators.iteritems():
-        if k == ast.If:  # or k == ast.UnaryOp:
-            for op in v:
-                operator = (k, op)
+    for operator in mutation_operators.iteritems():
+        if operator[0] == ast.If:  # or k == ast.UnaryOp:
 
-                # mutate the original sut
-                mutated_tree = mutator.mutate(operator)
-                ast.fix_missing_locations(mutated_tree)
+            # mutate the original sut
+            mutated_tree = mutator.mutate(operator)
+            ast.fix_missing_locations(mutated_tree)
 
-                # print out the mutated tree
-                code = codegen.to_source(mutated_tree)
-                print code
+            # print out the mutated tree
+            code = codegen.to_source(mutated_tree)
+            print code
 
 
 

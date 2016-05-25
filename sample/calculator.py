@@ -39,7 +39,7 @@ class Calculator(object):
     @classmethod
     def sum_all(cls, nums):
         n = len(nums)
-        if n == 0:
+        if not(n == 0):
             return 0
 
         res = 0
