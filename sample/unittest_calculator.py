@@ -33,6 +33,10 @@ class CalculatorTestCases(unittest.TestCase):
         operand1, operand2 = 5, 2
         self.assertEqual(self.sut.floorDiv(operand1, operand2), 2, "Incorrect Calculator.floorDiv")
 
+    def test_floorDivAssign(self):
+        operand1, operand2 = 5, 2
+        self.assertEqual(self.sut.floorDivAssign(operand1, operand2), 2, "Incorrect Calculator.floorDivAssign")
+
     def tearDown(self):
         pass
 

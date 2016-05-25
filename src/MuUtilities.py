@@ -136,6 +136,40 @@ class ASTMutator(ast.NodeTransformer):
             return mutated_node
         return node
 
+    def visit_If(self, node):
+        """
+        Visit and mutate if-statement
+        :param node:
+        :return:
+        """
+        if node.__class__ is self.operator[0] and node.test.__class__ is ast.Compare:
+            # # mutate
+            # mutated_node = self.mutate_single_node(node, self.operator[1])
+            # assert mutated_node is not None
+            #
+            # # visit child nodes
+            # self.dfs_visit(mutated_node)
+            #
+            # return mutated_node
+            unary_op_node = ast.UnaryOp()
+            unary_op_node.op = ast.Not()
+            unary_op_node.operand = node.test
+            unary_op_node.lineno = node.test.lineno
+            unary_op_node.col_offset = node.test.col_offset
+            node.test = unary_op_node
+
+            # visit child nodes
+            self.dfs_visit(node)
+
+        return node
+
+    def visit_For(self, node):
+
+        # visit child nodes
+        self.dfs_visit(node)
+
+        return node
+
     def visit_FunctionDef(self, node):
 
         # if ast.FunctionDef not in self.nodes_to_mutate:
@@ -220,8 +254,9 @@ if __name__ == "__main__":
     for k, v in mutation_operators.iteritems():
         if k == ast.BinOp:  # or k == ast.UnaryOp:
             for op in v:
-                # mutate the original sut
                 operator = (k, op)
+
+                # mutate the original sut
                 mutated_tree = mutator.mutate(operator)
                 ast.fix_missing_locations(mutated_tree)
 
@@ -234,7 +269,7 @@ if __name__ == "__main__":
                 if tester.update_suite(source_module, mutant_module):
                     test_result = tester.run()
 
-                    # todo: do further analaysis on test result
+                    # todo: do further analysis on test result
 
             print "********** Mutation Test Done! **********\n"
 

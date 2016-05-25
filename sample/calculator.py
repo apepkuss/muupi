@@ -31,6 +31,24 @@ class Calculator(object):
         quotient = x // y
         return quotient
 
+    @classmethod
+    def floorDivAssign(cls, x, y):
+        x //= y
+        return x
+
+    @classmethod
+    def sum_all(cls, nums):
+        n = len(nums)
+        if n == 0:
+            return 0
+
+        res = 0
+        for i in xrange(n):
+            if nums[i] == 0:
+                continue
+            res += nums[i]
+        return res
+
 
 class CalculatorTest(object):
 
