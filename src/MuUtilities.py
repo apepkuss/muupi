@@ -159,7 +159,7 @@ class ASTMutator(ast.NodeTransformer):
 
     def visit_Assign(self, node):
 
-        if node.__class__ is self.operator[0]:
+        if node.__class__ is self.operator[0] and node.lineno == 54:
             mutated_node = None
             for operator_class in self.operator[1]:
                 # mutate

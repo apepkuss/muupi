@@ -245,10 +245,13 @@ class ConstantReplacement(MutationOperator):
     @classmethod
     def mutate(cls, node):
 
-        if node.__class__ is ast.Assign and node.value.__class__ is ast.Num:
-            if hasattr(node.value, 'n'):
+        if node.__class__ is ast.Assign:
+            if node.value.__class__ is ast.Num and hasattr(node.value, 'n'):
                 original_value = getattr(node.value, 'n')
                 setattr(node.value, 'n', original_value+1)
+                return node
+            elif node.value.__class__ is ast.Str and hasattr(node.value, 's'):
+                setattr(node.value, 's', '')
                 return node
         return None
 

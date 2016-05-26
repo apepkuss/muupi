@@ -49,6 +49,11 @@ class Calculator(object):
             res += nums[i]
         return res
 
+    @classmethod
+    def get_version(cls):
+        version = "1.2.3"
+        return version
+
 
 class CalculatorTest(object):
 
