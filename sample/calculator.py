@@ -48,7 +48,8 @@ class Calculator(object):
 
         res = 0  # test CRP for numeric literals
         for i in xrange(n):   # test OIL (for)
-            if nums[i] == 0:  # test COI
+            flag = nums[i]==0
+            if flag:  # test COI
                 continue
             res += nums[i]
         return res

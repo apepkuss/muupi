@@ -104,22 +104,40 @@ class ASTMutator(ast.NodeTransformer):
 
         return wrapper
 
-    def visit_UnaryOp(self, node):
-        """
-        Visit and mutate a unary operation
-        """
-        if node.__class__ is self.operator[0]:
+    def visit_Compare(self, node):
 
+        if node.__class__ is self.operator[0]:
+            mutated_node = None
             for operator_class in self.operator[1]:
                 # mutate
                 mutated_node = self.mutate_single_node(node, operator_class)
                 if mutated_node is not None:
                     break
-
             if mutated_node is not None:
                 # visit child nodes
                 self.dfs_visit(mutated_node)
                 return mutated_node
+
+        self.dfs_visit(node)
+        return node
+
+    def visit_UnaryOp(self, node):
+        """
+        Visit and mutate a unary operation
+        """
+        if node.__class__ is self.operator[0]:
+            mutated_node = None
+            for operator_class in self.operator[1]:
+                # mutate
+                mutated_node = self.mutate_single_node(node, operator_class)
+                if mutated_node is not None:
+                    break
+            if mutated_node is not None:
+                # visit child nodes
+                self.dfs_visit(mutated_node)
+                return mutated_node
+
+        self.dfs_visit(node)
         return node
 
     def visit_BinOp(self, node):
@@ -127,17 +145,18 @@ class ASTMutator(ast.NodeTransformer):
         Visit and mutate a binary operation
         """
         if node.__class__ is self.operator[0]:
+            mutated_node = None
             for operator_class in self.operator[1]:
                 # mutate
                 mutated_node = self.mutate_single_node(node, operator_class)
                 if mutated_node is not None:
                     break
-
             if mutated_node is not None:
                 # visit child nodes
                 self.dfs_visit(mutated_node)
                 return mutated_node
 
+        self.dfs_visit(node)
         return node
 
     def visit_If(self, node):
@@ -147,7 +166,7 @@ class ASTMutator(ast.NodeTransformer):
         :return:
         """
         if node.__class__ is self.operator[0]:
-
+            mutated_node = None
             for operator_class in self.operator[1]:
                 # mutate
                 mutated_node = self.mutate_single_node(node, operator_class)
@@ -158,12 +177,13 @@ class ASTMutator(ast.NodeTransformer):
                 # visit child nodes
                 self.dfs_visit(mutated_node)
                 return mutated_node
+        self.dfs_visit(node)
         return node
 
     def visit_For(self, node):
 
         if node.__class__ is self.operator[0]:
-
+            mutated_node = None
             for operator_class in self.operator[1]:
                 # mutate
                 mutated_node = self.mutate_single_node(node, operator_class)
@@ -174,6 +194,8 @@ class ASTMutator(ast.NodeTransformer):
                 # visit child nodes
                 self.dfs_visit(mutated_node)
                 return mutated_node
+
+        self.dfs_visit(node)
         return node
 
     def visit_While(self, node):
@@ -190,8 +212,8 @@ class ASTMutator(ast.NodeTransformer):
                 # visit child nodes
                 self.dfs_visit(mutated_node)
                 return mutated_node
+        self.dfs_visit(node)
         return node
-
 
     def visit_Assign(self, node):
 
@@ -205,8 +227,9 @@ class ASTMutator(ast.NodeTransformer):
 
             if mutated_node is not None:
                 # visit child nodes
-                self.dfs_visit(node)
+                self.dfs_visit(mutated_node)
 
+        self.dfs_visit(node)
         return node
 
     def visit_FunctionDef(self, node):

@@ -99,6 +99,12 @@ class MutationOperator(object):
                 else:
                     cls.mutation_operators[ast.While].append(OneIterationLoop)
 
+            if name == 'ROR':
+                if ast.Compare not in cls.mutation_operators:
+                    cls.mutation_operators[ast.Compare] = [RelationalOperatorReplacement]
+                else:
+                    cls.mutation_operators[ast.Compare].append(RelationalOperatorReplacement)
+
         return cls.mutation_operators
 
 
@@ -256,12 +262,10 @@ class ConditionalOperatorInsertion(MutationOperator):
     @classmethod
     def mutate(cls, node):
 
-        if node.__class__ is ast.If and node.test.__class__ is ast.Compare:
+        if node.__class__ is ast.If:
             unary_op_node = ast.UnaryOp()
             unary_op_node.op = ast.Not()
             unary_op_node.operand = node.test
-            unary_op_node.lineno = node.test.lineno
-            unary_op_node.col_offset = node.test.col_offset
             node.test = unary_op_node
             return node
         return None
@@ -400,9 +404,6 @@ class OverriddenMethodCallingPositionChange(MutationOperator):
         pass
 
 
-
-
-
 class RelationalOperatorReplacement(MutationOperator):
     @classmethod
     def name(cls):
@@ -410,7 +411,27 @@ class RelationalOperatorReplacement(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        pass
+
+        if node.__class__ is ast.Compare and len(node.ops) == 1:
+            if node.ops[0].__class__ is ast.Eq:
+                node.ops.pop(0)
+                node.ops.append(ast.NotEq())
+            elif node.ops[0].__class__ is ast.NotEq:
+                node.ops.pop(0)
+                node.ops.append(ast.Eq())
+            elif node.ops[0].__class__ is ast.Lt:
+                node.ops.pop(0)
+                node.ops.append(ast.Gt())
+            elif node.ops[0].__class__ is ast.Gt:
+                node.ops.pop(0)
+                node.ops.append(ast.Lt())
+            elif node.ops[0].__class__ is ast.LtE:
+                node.ops.pop(0)
+                node.ops.append(ast.GtE())
+            elif node.ops[0].__class__ is ast.GtE:
+                node.ops.pop(0)
+                node.ops.append(ast.LtE())
+        return node
 
 
 class SuperCallingDeletion(MutationOperator):
@@ -527,7 +548,7 @@ if __name__ == "__main__":
     source_module = ModuleLoader.load_single_module(source_module_fullname)
 
     # build mutation operators
-    operators = ['OIL']
+    operators = ['ROR']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
