@@ -21,89 +21,100 @@ class MutationOperator(object):
             if name == 'AOD':
                 if ast.UnaryOp not in cls.mutation_operators:
                     cls.mutation_operators[ast.UnaryOp] = [ArithmeticOperatorDeletion]
-                else:
+                elif ArithmeticOperatorDeletion not in cls.mutation_operators[ast.UnaryOp]:
                     cls.mutation_operators[ast.UnaryOp].append(ArithmeticOperatorDeletion)
 
             if name == 'AOR':
                 if ast.UnaryOp not in cls.mutation_operators:
                     cls.mutation_operators[ast.UnaryOp] = [ArithmeticOperatorReplacement]
-                else:
+                elif ArithmeticOperatorReplacement not in cls.mutation_operators[ast.UnaryOp]:
                     cls.mutation_operators[ast.UnaryOp].append(ArithmeticOperatorReplacement)
 
                 if ast.BinOp not in cls.mutation_operators:
                     cls.mutation_operators[ast.BinOp] = [ArithmeticOperatorReplacement]
-                else:
+                elif ArithmeticOperatorReplacement not in cls.mutation_operators[ast.BinOp]:
                     cls.mutation_operators[ast.BinOp].append(ArithmeticOperatorReplacement)
 
             if name == 'ASR':
                 if ast.AugAssign not in cls.mutation_operators:
                     cls.mutation_operators[ast.AugAssign] = [AssignmentOperatorReplacement]
-                else:
+                elif AssignmentOperatorReplacement not in cls.mutation_operators[ast.AugAssign]:
                     cls.mutation_operators[ast.AugAssign].append(AssignmentOperatorReplacement)
 
             if name == 'BCR':
                 if ast.Break not in cls.mutation_operators:
                     cls.mutation_operators[ast.Break] = [BreakContinueReplacement]
-                else:
+                elif BreakContinueReplacement not in cls.mutation_operators[ast.Break]:
                     cls.mutation_operators[ast.Break].append(BreakContinueReplacement)
 
                 if ast.Continue not in cls.mutation_operators:
                     cls.mutation_operators[ast.Continue] = [BreakContinueReplacement]
-                else:
+                elif BreakContinueReplacement not in cls.mutation_operators[ast.Continue]:
                     cls.mutation_operators[ast.Continue].append(BreakContinueReplacement)
 
             if name == 'COD':
                 if ast.If not in cls.mutation_operators:
                     cls.mutation_operators[ast.If] = [ConditionalOperatorDeletion]
-                else:
+                elif ConditionalOperatorDeletion not in cls.mutation_operators[ast.If]:
                     cls.mutation_operators[ast.If].append(ConditionalOperatorDeletion)
 
             if name == 'COI':
                 if ast.If not in cls.mutation_operators:
                     cls.mutation_operators[ast.If] = [ConditionalOperatorInsertion]
-                else:
+                elif ConditionalOperatorInsertion not in cls.mutation_operators[ast.If]:
                     cls.mutation_operators[ast.If].append(ConditionalOperatorInsertion)
 
             if name == 'CRP':
                 if ast.Assign not in cls.mutation_operators:
                     cls.mutation_operators[ast.Assign] = [ConstantReplacement]
-                else:
+                elif ConstantReplacement not in cls.mutation_operators[ast.Assign]:
                     cls.mutation_operators[ast.Assign].append(ConstantReplacement)
 
             if name == 'LCR':
                 if ast.If not in cls.mutation_operators:
                     cls.mutation_operators[ast.If] = [LogicalConnectorReplacement]
-                else:
+                elif LogicalConnectorReplacement not in cls.mutation_operators[ast.If]:
                     cls.mutation_operators[ast.If].append(LogicalConnectorReplacement)
 
             if name == 'LOD':
                 if ast.UnaryOp not in cls.mutation_operators:
                     cls.mutation_operators[ast.UnaryOp] = [LogicalOperatorDeletion]
-                else:
+                elif LogicalOperatorDeletion not in cls.mutation_operators[ast.UnaryOp]:
                     cls.mutation_operators[ast.UnaryOp].append(LogicalOperatorDeletion)
 
             if name == 'LOR':
                 if ast.BinOp not in cls.mutation_operators:
                     cls.mutation_operators[ast.BinOp] = [LogicalOperatorReplacement]
-                else:
+                elif LogicalOperatorReplacement not in cls.mutation_operators[ast.BinOp]:
                     cls.mutation_operators[ast.BinOp].append(LogicalOperatorReplacement)
 
             if name == 'OIL':
                 if ast.For not in cls.mutation_operators:
                     cls.mutation_operators[ast.For] = [OneIterationLoop]
-                else:
+                elif OneIterationLoop not in cls.mutation_operators[ast.For]:
                     cls.mutation_operators[ast.For].append(OneIterationLoop)
 
                 if ast.While not in cls.mutation_operators:
                     cls.mutation_operators[ast.While] = [OneIterationLoop]
-                else:
+                elif OneIterationLoop not in cls.mutation_operators[ast.While]:
                     cls.mutation_operators[ast.While].append(OneIterationLoop)
 
             if name == 'ROR':
                 if ast.Compare not in cls.mutation_operators:
                     cls.mutation_operators[ast.Compare] = [RelationalOperatorReplacement]
-                else:
+                elif RelationalOperatorReplacement not in cls.mutation_operators[ast.Compare]:
                     cls.mutation_operators[ast.Compare].append(RelationalOperatorReplacement)
+
+            if name == 'ZIL':
+                if ast.For not in cls.mutation_operators:
+                    cls.mutation_operators[ast.For] = [ZeroIterationLoop]
+                elif ZeroIterationLoop not in cls.mutation_operators[ast.For]:
+                    cls.mutation_operators[ast.For].append(ZeroIterationLoop)
+
+                if ast.While not in cls.mutation_operators:
+                    cls.mutation_operators[ast.While] = [ZeroIterationLoop]
+                elif ZeroIterationLoop not in cls.mutation_operators[ast.While]:
+                    cls.mutation_operators[ast.While].append(ZeroIterationLoop)
 
         return cls.mutation_operators
 
@@ -538,7 +549,9 @@ class ZeroIterationLoop(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        pass
+        if node.__class__ is ast.For or node.__class__ is ast.While:
+            node.body = [ast.Break()]
+        return node
 
 
 if __name__ == "__main__":
@@ -548,7 +561,7 @@ if __name__ == "__main__":
     source_module = ModuleLoader.load_single_module(source_module_fullname)
 
     # build mutation operators
-    operators = ['ROR']
+    operators = ['ZIL']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
