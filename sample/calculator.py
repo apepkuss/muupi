@@ -35,6 +35,8 @@ class Calculator(object):
             return quotient
         except ZeroDivisionError:
             print "divided by zero"
+        except:
+            print "unknown exception"
 
     @classmethod
     def floorDivAssign(cls, x, y):
