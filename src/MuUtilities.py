@@ -232,6 +232,22 @@ class ASTMutator(ast.NodeTransformer):
         self.dfs_visit(node)
         return node
 
+    def visit_ExceptHandler(self, node):
+
+        if node.__class__ is self.operator[0]:
+            mutated_node = None
+            for operator_class in self.operator[1]:
+                # mutate
+                mutated_node = self.mutate_single_node(node, operator_class)
+                if mutated_node is not None:
+                    break
+            if mutated_node is not None:
+                # visit child nodes
+                self.dfs_visit(mutated_node)
+
+        self.dfs_visit(node)
+        return node
+
     def visit_FunctionDef(self, node):
 
         # if ast.FunctionDef not in self.nodes_to_mutate:

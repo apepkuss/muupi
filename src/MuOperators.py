@@ -116,6 +116,12 @@ class MutationOperator(object):
                 elif ZeroIterationLoop not in cls.mutation_operators[ast.While]:
                     cls.mutation_operators[ast.While].append(ZeroIterationLoop)
 
+            if name == 'EXD':
+                if ast.ExceptHandler not in cls.mutation_operators:
+                    cls.mutation_operators[ast.ExceptHandler] = [ExceptionHandlerDeletion]
+                elif ExceptionHandlerDeletion not in cls.mutation_operators:
+                    cls.mutation_operators[ast.ExceptHandler].append(ExceptionHandlerDeletion)
+
         return cls.mutation_operators
 
 
@@ -368,11 +374,13 @@ class DecoratorDeletion(MutationOperator):
 class ExceptionHandlerDeletion(MutationOperator):
     @classmethod
     def name(cls):
-        return "EHD"
+        return "EXD"
 
     @classmethod
     def mutate(cls, node):
-        pass
+        if node.__class__ is ast.ExceptHandler:
+            node.body = [ast.Raise()]
+        return node
 
 
 class ExceptionSwallowing(MutationOperator):
@@ -561,7 +569,7 @@ if __name__ == "__main__":
     source_module = ModuleLoader.load_single_module(source_module_fullname)
 
     # build mutation operators
-    operators = ['ZIL']
+    operators = ['EXD']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
@@ -569,6 +577,9 @@ if __name__ == "__main__":
     mutator = ASTMutator()
 
     original_tree = mutator.parse(source_module)
+    # # print out the original tree
+    # code = codegen.to_source(original_tree)
+    # print code
     ast.fix_missing_locations(original_tree)
 
     # mutate the original tree

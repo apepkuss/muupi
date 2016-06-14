@@ -30,8 +30,11 @@ class Calculator(object):
 
     @classmethod
     def floorDiv(cls, x, y):
-        quotient = x // y
-        return quotient
+        try:
+            quotient = x // y
+            return quotient
+        except ZeroDivisionError:
+            print "divided by zero"
 
     @classmethod
     def floorDivAssign(cls, x, y):
