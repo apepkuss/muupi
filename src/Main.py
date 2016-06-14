@@ -1,5 +1,6 @@
 from MuManager import *
 from MuUtilities import *
+from MuOperators import *
 from astdump import *
 import codegen
 import imp
@@ -29,7 +30,7 @@ if __name__ == "__main__":
     # todo: do further analysis on the test result
 
     # build mutation operators
-    operators = ['AOD', 'AOR', 'ASR']
+    operators = ['LCR']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 

@@ -109,15 +109,17 @@ class ASTMutator(ast.NodeTransformer):
         Visit and mutate a unary operation
         """
         if node.__class__ is self.operator[0]:
-            # mutate
-            mutated_node = self.mutate_single_node(node, self.operator[1])
-            assert mutated_node is not None
 
-            # visit child nodes
-            self.dfs_visit(mutated_node)
+            for operator_class in self.operator[1]:
+                # mutate
+                mutated_node = self.mutate_single_node(node, operator_class)
+                if mutated_node is not None:
+                    break
 
-            # sample code: mutate Add to Subtract
-            return mutated_node
+            if mutated_node is not None:
+                # visit child nodes
+                self.dfs_visit(mutated_node)
+                return mutated_node
         return node
 
     def visit_BinOp(self, node):
@@ -125,15 +127,17 @@ class ASTMutator(ast.NodeTransformer):
         Visit and mutate a binary operation
         """
         if node.__class__ is self.operator[0]:
-            # mutate
-            mutated_node = self.mutate_single_node(node, self.operator[1])
-            assert mutated_node is not None
+            for operator_class in self.operator[1]:
+                # mutate
+                mutated_node = self.mutate_single_node(node, operator_class)
+                if mutated_node is not None:
+                    break
 
-            # visit child nodes
-            self.dfs_visit(mutated_node)
+            if mutated_node is not None:
+                # visit child nodes
+                self.dfs_visit(mutated_node)
+                return mutated_node
 
-            # sample code: mutate Add to Subtract
-            return mutated_node
         return node
 
     def visit_If(self, node):
@@ -149,17 +153,49 @@ class ASTMutator(ast.NodeTransformer):
                 mutated_node = self.mutate_single_node(node, operator_class)
                 if mutated_node is not None:
                     break
-            assert mutated_node is not None
 
-            # visit child nodes
-            self.dfs_visit(mutated_node)
-
-            return mutated_node
+            if mutated_node is not None:
+                # visit child nodes
+                self.dfs_visit(mutated_node)
+                return mutated_node
         return node
+
+    def visit_For(self, node):
+
+        if node.__class__ is self.operator[0]:
+
+            for operator_class in self.operator[1]:
+                # mutate
+                mutated_node = self.mutate_single_node(node, operator_class)
+                if mutated_node is not None:
+                    break
+
+            if mutated_node is not None:
+                # visit child nodes
+                self.dfs_visit(mutated_node)
+                return mutated_node
+        return node
+
+    def visit_While(self, node):
+
+        if node.__class__ is self.operator[0]:
+
+            for operator_class in self.operator[1]:
+                # mutate
+                mutated_node = self.mutate_single_node(node, operator_class)
+                if mutated_node is not None:
+                    break
+
+            if mutated_node is not None:
+                # visit child nodes
+                self.dfs_visit(mutated_node)
+                return mutated_node
+        return node
+
 
     def visit_Assign(self, node):
 
-        if node.__class__ is self.operator[0] and node.lineno == 54:
+        if node.__class__ is self.operator[0]:
             mutated_node = None
             for operator_class in self.operator[1]:
                 # mutate
@@ -170,13 +206,6 @@ class ASTMutator(ast.NodeTransformer):
             if mutated_node is not None:
                 # visit child nodes
                 self.dfs_visit(node)
-
-        return node
-
-    def visit_For(self, node):
-
-        # visit child nodes
-        self.dfs_visit(node)
 
         return node
 

@@ -70,6 +70,35 @@ class MutationOperator(object):
                 else:
                     cls.mutation_operators[ast.Assign].append(ConstantReplacement)
 
+            if name == 'LCR':
+                if ast.If not in cls.mutation_operators:
+                    cls.mutation_operators[ast.If] = [LogicalConnectorReplacement]
+                else:
+                    cls.mutation_operators[ast.If].append(LogicalConnectorReplacement)
+
+            if name == 'LOD':
+                if ast.UnaryOp not in cls.mutation_operators:
+                    cls.mutation_operators[ast.UnaryOp] = [LogicalOperatorDeletion]
+                else:
+                    cls.mutation_operators[ast.UnaryOp].append(LogicalOperatorDeletion)
+
+            if name == 'LOR':
+                if ast.BinOp not in cls.mutation_operators:
+                    cls.mutation_operators[ast.BinOp] = [LogicalOperatorReplacement]
+                else:
+                    cls.mutation_operators[ast.BinOp].append(LogicalOperatorReplacement)
+
+            if name == 'OIL':
+                if ast.For not in cls.mutation_operators:
+                    cls.mutation_operators[ast.For] = [OneIterationLoop]
+                else:
+                    cls.mutation_operators[ast.For].append(OneIterationLoop)
+
+                if ast.While not in cls.mutation_operators:
+                    cls.mutation_operators[ast.While] = [OneIterationLoop]
+                else:
+                    cls.mutation_operators[ast.While].append(OneIterationLoop)
+
         return cls.mutation_operators
 
 
@@ -212,9 +241,10 @@ class ConditionalOperatorDeletion(MutationOperator):
         """
         remove bitwise invert operator: ~
         """
-        if node.__class__ is ast.If and node.test.__class__ is ast.UnaryOp and node.test.op.__class__ is ast.Not:
-            node.test = node.test.operand
-            return node
+        if node.__class__ is ast.If and node.test.__class__ is ast.UnaryOp:
+            if node.test.op.__class__ is ast.Not:
+                node.test = node.test.operand
+                return node
         return None
 
 
@@ -235,6 +265,60 @@ class ConditionalOperatorInsertion(MutationOperator):
             node.test = unary_op_node
             return node
         return None
+
+
+class LogicalConnectorReplacement(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "LCR"
+
+    @classmethod
+    def mutate(cls, node):
+
+        if node.__class__ is ast.If and node.test.__class__ is ast.BoolOp:
+            if node.test.op.__class__ is ast.And:
+                node.test.op = ast.Or()
+                return node
+            if node.test.op.__class__ is ast.Or:
+                node.test.op = ast.And()
+                return node
+        return None
+
+
+class LogicalOperatorDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "LOD"
+
+    @classmethod
+    def mutate(cls, node):
+
+        if node.__class__ is ast.UnaryOp and node.op.__class__ is ast.Invert:
+            return node.operand
+
+        return node
+
+
+class LogicalOperatorReplacement(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "LOR"
+
+    @classmethod
+    def mutate(cls, node):
+
+        if node.__class__ is ast.BinOp:
+            if node.op.__class__ is ast.BitAnd:
+                return ast.BinOp(left=node.left, op=ast.BitOr(), right=node.right)
+            if node.op.__class__ is ast.BitOr:
+                return ast.BinOp(left=node.left, op=ast.BitAnd(), right=node.right)
+            if node.op.__class__ is ast.BitXor:
+                return ast.BinOp(left=node.left, op=ast.BitAnd(), right=node.right)
+            if node.op.__class__ is ast.LShift:
+                return ast.BinOp(left=node.left, op=ast.RShift(), right=node.right)
+            if node.op.__class__ is ast.RShift:
+                return ast.BinOp(left=node.left, op=ast.LShift(), right=node.right)
+        return node
 
 
 class ConstantReplacement(MutationOperator):
@@ -316,34 +400,7 @@ class OverriddenMethodCallingPositionChange(MutationOperator):
         pass
 
 
-class LogicalConnectorReplacement(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "LCR"
 
-    @classmethod
-    def mutate(cls, node):
-        pass
-
-
-class LogicalOperatorDeletion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "LOD"
-
-    @classmethod
-    def mutate(cls, node):
-        pass
-
-
-class LogicalOperatorReplacement(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "LOR"
-
-    @classmethod
-    def mutate(cls, node):
-        pass
 
 
 class RelationalOperatorReplacement(MutationOperator):
@@ -403,7 +460,14 @@ class OneIterationLoop(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        pass
+
+        if node.__class__ is ast.While:
+            node.body.append(ast.Break())
+
+        elif node.__class__ is ast.For:
+            node.body.append(ast.Break())
+
+        return node
 
 
 class ReverseIterationLoop(MutationOperator):
@@ -463,7 +527,7 @@ if __name__ == "__main__":
     source_module = ModuleLoader.load_single_module(source_module_fullname)
 
     # build mutation operators
-    operators = ['CRP']
+    operators = ['OIL']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
@@ -477,16 +541,16 @@ if __name__ == "__main__":
     operator = None
     mutator_dict = {}
     for operator in mutation_operators.iteritems():
-        if operator[0] == ast.Assign:  # or k == ast.UnaryOp:
+        #if operator[0] == ast.UnaryOp:  # or k == ast.UnaryOp:
 
-            # mutate the original sut
-            mutated_tree = mutator.mutate(operator)
-            ast.fix_missing_locations(mutated_tree)
+        # mutate the original sut
+        mutated_tree = mutator.mutate(operator)
+        ast.fix_missing_locations(mutated_tree)
 
-            # print out the mutated tree
-            code = codegen.to_source(mutated_tree)
-            print code
+        # print out the mutated tree
+        code = codegen.to_source(mutated_tree)
+        print code
 
 
 
-            print "********** Operator Test Done! **********\n"
+    print "********** Operator Test Done! **********\n"
