@@ -105,12 +105,66 @@ class Calculator(object):
     def bit_right_shift(cls, x):
         return x >> 1
 
+    @classmethod
+    def sum_of_collection(cls, nums, start, end, step):
+        res = 0
+        if len(nums) > 0:
+            for anum in nums[start:end:step]:
+                res += anum
+        return res
+
+
+class ScientificCalculator(Calculator):
+
+    @classmethod
+    def add(cls, x, y):
+        """
+        Override add function defined in Calculator
+        :param x:
+        :param y:
+        :return:
+        """
+        pass
+
+    @classmethod
+    def subtract(cls, x, y):
+        """
+        Override subtract function defined in Calculator
+        :param x:
+        :param y:
+        :return:
+        """
+        pass
+
+    @classmethod
+    def multiply(cls, x, y):
+        """
+        Override multiply function defined in Calculator
+        :param x:
+        :param y:
+        :return:
+        """
+        pass
+
+    @classmethod
+    def divide(cls, x, y):
+        """
+        Override divide function defined in Calculator
+        :param x:
+        :param y:
+        :return:
+        """
+        pass
+
 
 class CalculatorTest(object):
 
-    @classmethod
-    def test(cls):
-        pass
+    def __init__(self):
+        self.name = "name_value"
+        text = self.name
+
+    def get_name(self):
+        return self.name
 
 
 def method_name():

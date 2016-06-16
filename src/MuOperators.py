@@ -122,6 +122,48 @@ class MutationOperator(object):
                 elif ExceptionHandlerDeletion not in cls.mutation_operators:
                     cls.mutation_operators[ast.ExceptHandler].append(ExceptionHandlerDeletion)
 
+            if name == 'EXS':
+                if ast.ExceptHandler not in cls.mutation_operators:
+                    cls.mutation_operators[ast.ExceptHandler] = [ExceptionSwallowing]
+                elif ExceptionSwallowing not in cls.mutation_operators:
+                    cls.mutation_operators[ast.ExceptHandler].append(ExceptionSwallowing)
+
+            # if name == 'IOD':
+            #     if ast.ClassDef not in cls.mutation_operators:
+            #         cls.mutation_operators[ast.ClassDef] = [OverridingMethodDeletion]
+            #     elif OverridingMethodDeletion not in cls.mutation_operators:
+            #         cls.mutation_operators[ast.ClassDef].append(OverridingMethodDeletion)
+
+            if name == 'SVD':
+                if ast.Attribute not in cls.mutation_operators:
+                    cls.mutation_operators[ast.Attribute] = [SelfVariableDeletion]
+                elif SelfVariableDeletion not in cls.mutation_operators:
+                    cls.mutation_operators[ast.Attribute].append(SelfVariableDeletion)
+
+            # if name == 'DDL':
+            #     if ast.FunctionDef not in cls.mutation_operators:
+            #         cls.mutation_operators[ast.FunctionDef] = [DecoratorDeletion]
+            #     elif DecoratorDeletion not in cls.mutation_operators:
+            #         cls.mutation_operators[ast.FunctionDef].append(DecoratorDeletion)
+
+            if name == 'SsIR':
+                if ast.Slice not in cls.mutation_operators:
+                    cls.mutation_operators[ast.Slice] = [SliceStartIndexDeletion]
+                elif SliceStartIndexDeletion not in cls.mutation_operators[ast.Slice]:
+                    cls.mutation_operators[ast.Slice].append(SliceStartIndexDeletion)
+
+            if name == 'SeIR':
+                if ast.Slice not in cls.mutation_operators:
+                    cls.mutation_operators[ast.Slice] = [SliceEndIndexDeletion]
+                elif SliceEndIndexDeletion not in cls.mutation_operators[ast.Slice]:
+                    cls.mutation_operators[ast.Slice].append(SliceEndIndexDeletion)
+
+            if name == 'SpIR':
+                if ast.Slice not in cls.mutation_operators:
+                    cls.mutation_operators[ast.Slice] = [SliceStepIndexDeletion]
+                elif SliceStepIndexDeletion not in cls.mutation_operators[ast.Slice]:
+                    cls.mutation_operators[ast.Slice].append(SliceStepIndexDeletion)
+
         return cls.mutation_operators
 
 
@@ -368,7 +410,9 @@ class DecoratorDeletion(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        pass
+        if node.__class__ is ast.FunctionDef and len(node.decorator_list) > 0:
+            node.decorator_list = []
+        return node
 
 
 class ExceptionHandlerDeletion(MutationOperator):
@@ -390,7 +434,9 @@ class ExceptionSwallowing(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        pass
+        if node.__class__ is ast.ExceptHandler:
+            node.body = [ast.Pass()]
+        return node
 
 
 class HidingVariableDeletion(MutationOperator):
@@ -473,14 +519,40 @@ class SuperCallingInsertion(MutationOperator):
         pass
 
 
-class SliceIndexRemove(MutationOperator):
+class SliceStartIndexDeletion(MutationOperator):
     @classmethod
     def name(cls):
-        return "SIR"
+        return "SsIR"
 
     @classmethod
     def mutate(cls, node):
-        pass
+        if node.__class__ is ast.Slice and node.lower is not None:
+            node.lower = None
+        return node
+
+
+class SliceEndIndexDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "SeIR"
+
+    @classmethod
+    def mutate(cls, node):
+        if node.__class__ is ast.Slice and node.upper is not None:
+            node.upper = None
+        return node
+
+
+class SliceStepIndexDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "SpIR"
+
+    @classmethod
+    def mutate(cls, node):
+        if node.__class__ is ast.Slice and node.step is not None:
+            node.step = None
+        return node
 
 
 class ClassmethodDecoratorInsertion(MutationOperator):
@@ -547,7 +619,11 @@ class SelfVariableDeletion(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        pass
+        if node.__class__ is ast.Attribute:
+            if node.value.__class__ is ast.Name and node.value.id == 'self':
+                mutated_node = ast.Name(node.attr, node.ctx)
+                return mutated_node
+        return node
 
 
 class ZeroIterationLoop(MutationOperator):
@@ -569,7 +645,7 @@ if __name__ == "__main__":
     source_module = ModuleLoader.load_single_module(source_module_fullname)
 
     # build mutation operators
-    operators = ['EXD']
+    operators = ['SpIR']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
