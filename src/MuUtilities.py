@@ -264,7 +264,6 @@ class ASTMutator(ast.NodeTransformer):
         self.dfs_visit(node)
         return node
 
-
     def visit_ExceptHandler(self, node):
 
         if node.__class__ is self.operator[0]:

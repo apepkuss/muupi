@@ -70,6 +70,18 @@ class MutationOperator(object):
                 elif ConstantReplacement not in cls.mutation_operators[ast.Assign]:
                     cls.mutation_operators[ast.Assign].append(ConstantReplacement)
 
+            if name == 'EHD':
+                if ast.ExceptHandler not in cls.mutation_operators:
+                    cls.mutation_operators[ast.ExceptHandler] = [ExceptionHandlerDeletion]
+                elif ExceptionHandlerDeletion not in cls.mutation_operators:
+                    cls.mutation_operators[ast.ExceptHandler].append(ExceptionHandlerDeletion)
+
+            if name == 'EXS':
+                if ast.ExceptHandler not in cls.mutation_operators:
+                    cls.mutation_operators[ast.ExceptHandler] = [ExceptionSwallowing]
+                elif ExceptionSwallowing not in cls.mutation_operators:
+                    cls.mutation_operators[ast.ExceptHandler].append(ExceptionSwallowing)
+
             if name == 'LCR':
                 if ast.If not in cls.mutation_operators:
                     cls.mutation_operators[ast.If] = [LogicalConnectorReplacement]
@@ -99,52 +111,17 @@ class MutationOperator(object):
                 elif OneIterationLoop not in cls.mutation_operators[ast.While]:
                     cls.mutation_operators[ast.While].append(OneIterationLoop)
 
+            if name == 'RIL':
+                if ast.For not in cls.mutation_operators:
+                    cls.mutation_operators[ast.For] = [ReverseIterationLoop]
+                elif ReverseIterationLoop not in cls.mutation_operators[ast.For]:
+                    cls.mutation_operators[ast.For].append(ReverseIterationLoop)
+
             if name == 'ROR':
                 if ast.Compare not in cls.mutation_operators:
                     cls.mutation_operators[ast.Compare] = [RelationalOperatorReplacement]
                 elif RelationalOperatorReplacement not in cls.mutation_operators[ast.Compare]:
                     cls.mutation_operators[ast.Compare].append(RelationalOperatorReplacement)
-
-            if name == 'ZIL':
-                if ast.For not in cls.mutation_operators:
-                    cls.mutation_operators[ast.For] = [ZeroIterationLoop]
-                elif ZeroIterationLoop not in cls.mutation_operators[ast.For]:
-                    cls.mutation_operators[ast.For].append(ZeroIterationLoop)
-
-                if ast.While not in cls.mutation_operators:
-                    cls.mutation_operators[ast.While] = [ZeroIterationLoop]
-                elif ZeroIterationLoop not in cls.mutation_operators[ast.While]:
-                    cls.mutation_operators[ast.While].append(ZeroIterationLoop)
-
-            if name == 'EXD':
-                if ast.ExceptHandler not in cls.mutation_operators:
-                    cls.mutation_operators[ast.ExceptHandler] = [ExceptionHandlerDeletion]
-                elif ExceptionHandlerDeletion not in cls.mutation_operators:
-                    cls.mutation_operators[ast.ExceptHandler].append(ExceptionHandlerDeletion)
-
-            if name == 'EXS':
-                if ast.ExceptHandler not in cls.mutation_operators:
-                    cls.mutation_operators[ast.ExceptHandler] = [ExceptionSwallowing]
-                elif ExceptionSwallowing not in cls.mutation_operators:
-                    cls.mutation_operators[ast.ExceptHandler].append(ExceptionSwallowing)
-
-            # if name == 'IOD':
-            #     if ast.ClassDef not in cls.mutation_operators:
-            #         cls.mutation_operators[ast.ClassDef] = [OverridingMethodDeletion]
-            #     elif OverridingMethodDeletion not in cls.mutation_operators:
-            #         cls.mutation_operators[ast.ClassDef].append(OverridingMethodDeletion)
-
-            if name == 'SVD':
-                if ast.Attribute not in cls.mutation_operators:
-                    cls.mutation_operators[ast.Attribute] = [SelfVariableDeletion]
-                elif SelfVariableDeletion not in cls.mutation_operators:
-                    cls.mutation_operators[ast.Attribute].append(SelfVariableDeletion)
-
-            # if name == 'DDL':
-            #     if ast.FunctionDef not in cls.mutation_operators:
-            #         cls.mutation_operators[ast.FunctionDef] = [DecoratorDeletion]
-            #     elif DecoratorDeletion not in cls.mutation_operators:
-            #         cls.mutation_operators[ast.FunctionDef].append(DecoratorDeletion)
 
             if name == 'SsIR':
                 if ast.Slice not in cls.mutation_operators:
@@ -164,11 +141,22 @@ class MutationOperator(object):
                 elif SliceStepIndexDeletion not in cls.mutation_operators[ast.Slice]:
                     cls.mutation_operators[ast.Slice].append(SliceStepIndexDeletion)
 
-            if name == 'RIL':
+            if name == 'SVD':
+                if ast.Attribute not in cls.mutation_operators:
+                    cls.mutation_operators[ast.Attribute] = [SelfVariableDeletion]
+                elif SelfVariableDeletion not in cls.mutation_operators:
+                    cls.mutation_operators[ast.Attribute].append(SelfVariableDeletion)
+
+            if name == 'ZIL':
                 if ast.For not in cls.mutation_operators:
-                    cls.mutation_operators[ast.For] = [ReverseIterationLoop]
-                elif ReverseIterationLoop not in cls.mutation_operators[ast.For]:
-                    cls.mutation_operators[ast.For].append(ReverseIterationLoop)
+                    cls.mutation_operators[ast.For] = [ZeroIterationLoop]
+                elif ZeroIterationLoop not in cls.mutation_operators[ast.For]:
+                    cls.mutation_operators[ast.For].append(ZeroIterationLoop)
+
+                if ast.While not in cls.mutation_operators:
+                    cls.mutation_operators[ast.While] = [ZeroIterationLoop]
+                elif ZeroIterationLoop not in cls.mutation_operators[ast.While]:
+                    cls.mutation_operators[ast.While].append(ZeroIterationLoop)
 
         return cls.mutation_operators
 
@@ -409,22 +397,10 @@ class ConstantReplacement(MutationOperator):
         return None
 
 
-class DecoratorDeletion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "DDL"
-
-    @classmethod
-    def mutate(cls, node):
-        if node.__class__ is ast.FunctionDef and len(node.decorator_list) > 0:
-            node.decorator_list = []
-        return node
-
-
 class ExceptionHandlerDeletion(MutationOperator):
     @classmethod
     def name(cls):
-        return "EXD"
+        return "EHD"
 
     @classmethod
     def mutate(cls, node):
@@ -443,36 +419,6 @@ class ExceptionSwallowing(MutationOperator):
         if node.__class__ is ast.ExceptHandler:
             node.body = [ast.Pass()]
         return node
-
-
-class HidingVariableDeletion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "IHD"
-
-    @classmethod
-    def mutate(cls, node):
-        pass
-
-
-class OverridingMethodDeletion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "IOD"
-
-    @classmethod
-    def mutate(cls, node):
-        pass
-
-
-class OverriddenMethodCallingPositionChange(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "IOP"
-
-    @classmethod
-    def mutate(cls, node):
-        pass
 
 
 class RelationalOperatorReplacement(MutationOperator):
@@ -503,26 +449,6 @@ class RelationalOperatorReplacement(MutationOperator):
                 node.ops.pop(0)
                 node.ops.append(ast.LtE())
         return node
-
-
-class SuperCallingDeletion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "SCD"
-
-    @classmethod
-    def mutate(cls, node):
-        pass
-
-
-class SuperCallingInsertion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "SCI"
-
-    @classmethod
-    def mutate(cls, node):
-        pass
 
 
 class SliceStartIndexDeletion(MutationOperator):
@@ -561,16 +487,6 @@ class SliceStepIndexDeletion(MutationOperator):
         return node
 
 
-class ClassmethodDecoratorInsertion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "CDI"
-
-    @classmethod
-    def mutate(cls, node):
-        pass
-
-
 class OneIterationLoop(MutationOperator):
     @classmethod
     def name(cls):
@@ -601,26 +517,6 @@ class ReverseIterationLoop(MutationOperator):
         return node
 
 
-class StaticmethodDecoratorInsertion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "SDI"
-
-    @classmethod
-    def mutate(cls, node):
-        pass
-
-
-class StatementDeletion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "SDL"
-
-    @classmethod
-    def mutate(cls, node):
-        pass
-
-
 class SelfVariableDeletion(MutationOperator):
     @classmethod
     def name(cls):
@@ -645,6 +541,102 @@ class ZeroIterationLoop(MutationOperator):
         if node.__class__ is ast.For or node.__class__ is ast.While:
             node.body = [ast.Break()]
         return node
+
+
+
+
+###################### todo: another 9 rules to be added ############################
+
+class ClassmethodDecoratorInsertion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "CDI"
+
+    @classmethod
+    def mutate(cls, node):
+        pass
+
+
+class DecoratorDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "DDL"
+
+    @classmethod
+    def mutate(cls, node):
+        if node.__class__ is ast.FunctionDef and len(node.decorator_list) > 0:
+            node.decorator_list = []
+        return node
+
+
+class HidingVariableDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "IHD"
+
+    @classmethod
+    def mutate(cls, node):
+        pass
+
+
+class OverridingMethodDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "IOD"
+
+    @classmethod
+    def mutate(cls, node):
+        pass
+
+
+class OverriddenMethodCallingPositionChange(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "IOP"
+
+    @classmethod
+    def mutate(cls, node):
+        pass
+
+
+class StaticmethodDecoratorInsertion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "SDI"
+
+    @classmethod
+    def mutate(cls, node):
+        pass
+
+
+class StatementDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "SDL"
+
+    @classmethod
+    def mutate(cls, node):
+        pass
+
+
+class SuperCallingDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "SCD"
+
+    @classmethod
+    def mutate(cls, node):
+        pass
+
+
+class SuperCallingInsertion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "SCI"
+
+    @classmethod
+    def mutate(cls, node):
+        pass
 
 
 if __name__ == "__main__":
