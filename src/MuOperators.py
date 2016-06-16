@@ -331,7 +331,6 @@ class LogicalConnectorReplacement(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-
         if node.__class__ is ast.If and node.test.__class__ is ast.BoolOp:
             if node.test.op.__class__ is ast.And:
                 node.test.op = ast.Or()
@@ -363,7 +362,6 @@ class LogicalOperatorReplacement(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-
         if node.__class__ is ast.BinOp:
             if node.op.__class__ is ast.BitAnd:
                 return ast.BinOp(left=node.left, op=ast.BitOr(), right=node.right)
@@ -663,8 +661,6 @@ if __name__ == "__main__":
     operator = None
     mutator_dict = {}
     for operator in mutation_operators.iteritems():
-        #if operator[0] == ast.UnaryOp:  # or k == ast.UnaryOp:
-
         # mutate the original sut
         mutated_tree = mutator.mutate(operator)
         ast.fix_missing_locations(mutated_tree)

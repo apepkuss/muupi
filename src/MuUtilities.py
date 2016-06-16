@@ -2,6 +2,7 @@ import imp
 import importlib
 from MuOperators import *
 from MuTester import *
+from copy import deepcopy
 
 
 class ModuleLoader(object):
@@ -61,8 +62,9 @@ class ASTMutator(ast.NodeTransformer):
 
     def parse(self, module):
         """
-        Build an abstract syntax tree from a source file
-        Return an AST tree
+        Build an abstract syntax tree from a target module.
+        :param module: target module to parse
+        :return: an abstract syntax tree
         """
         with open(module.__file__) as module_file:
             try:
@@ -77,13 +79,42 @@ class ASTMutator(ast.NodeTransformer):
     def mutate(self, operator):
         """
         Mutate an abstract syntax tree by a single mutation operator
+        :param operator: pre-defined mutation operator
+        :return: a mutated abstract syntax tree
         """
         self.operator = operator
 
-        # traverse the target ast tree
-        mutated_ast = self.visit(self.original_ast)
+        # make a copy of the original ast for mutation
+        original_ast_copy = deepcopy(self.original_ast)
 
-        return mutated_ast
+        ast.fix_missing_locations(original_ast_copy)
+
+        # traverse the target ast tree
+        mutated_ast = self.visit(original_ast_copy)
+
+        ast.fix_missing_locations(mutated_ast)
+
+        # print out the mutated tree
+        code = codegen.to_source(mutated_ast)
+        print code
+
+        # generate a mutant module from mutated ast tree
+        mutant_module = self.generate_mutant_module(mutated_ast)
+        return mutant_module
+
+    def generate_mutant_module(self, mutated_ast, module_shortname=""):
+        """
+        Generate a module from a mutated ast
+        :param mutated_ast: the mutated ast
+        :param module_shortname: the short name of the module mutated
+        :return: an mutated module
+        """
+        prefix = "mutant_"
+        mutant_module_shortname = prefix + module_shortname
+        mutant_code = compile(mutated_ast, mutant_module_shortname, "exec")
+        mutant_module = imp.new_module(mutant_module_shortname)
+        exec mutant_code in mutant_module.__dict__
+        return mutant_module
 
     def dfs_visit(self, node):
         """
@@ -314,18 +345,6 @@ class ASTMutator(ast.NodeTransformer):
         Mutate a single node by a specified operator
         """
         return operator.mutate(node)
-
-
-def generate_mutant_module(mutated_ast, module_shortname):
-    """
-    generate a mutant module from a mutated ast
-    """
-    prefix = "mutant_"
-    mutant_module_shortname = prefix + module_shortname
-    mutant_code = compile(mutated_ast, mutant_module_shortname, "exec")
-    mutant_module = imp.new_module(mutant_module_shortname)
-    exec mutant_code in mutant_module.__dict__
-    return mutant_module
 
 
 if __name__ == "__main__":

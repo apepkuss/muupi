@@ -2,6 +2,8 @@ from MuManager import *
 from MuUtilities import *
 from MuOperators import *
 from astdump import *
+from copy import deepcopy
+
 import codegen
 import imp
 import sys
@@ -10,59 +12,58 @@ import sys
 if __name__ == "__main__":
     manager = MuManager()
 
-    # load the module to mutate
-    source_module_fullname = "sample.calculator"
-    source_module_shortname = "calculator"
-    source_module = ModuleLoader.load_single_module(source_module_fullname)
+    # load target module
+    module_under_test_fullname = "sample.calculator"
+    module_under_test_shortname = "calculator"
+    module_under_test = ModuleLoader.load_single_module(module_under_test_fullname)
 
-    # load the test module
+    # load test suite module
     suite_module_name = "sample.unittest_calculator"
     suite_module = ModuleLoader.load_single_module(suite_module_name)
 
     # create an instance of MuTester
     tester = MuTester(suite_module)
 
-    print "********** Run test suite on source file **********"
+    print "\n\n********** Phase 1: run test suite on target module **********\n"
 
     # run a unit test suite on original sut
     test_result = tester.run()
 
     # todo: do further analysis on the test result
 
+    print "\n\n********** Phase 2: mutate target module with mutation operators and run test **********\n"
     # build mutation operators
-    operators = ['LCR']
+    operators = ['AOR']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
-    # build ast
+    # build ast of target module
     mutator = ASTMutator()
+    original_tree = mutator.parse(module_under_test)
 
-    original_tree = mutator.parse(source_module)
+    # print out the abstract syntax tree of target module
+    code = codegen.to_source(original_tree)
+    print code
+
     ast.fix_missing_locations(original_tree)
 
-    print "********** Run test suite on mutants **********"
     # mutate the original tree
     operator = None
     mutator_dict = {}
-    for k, v in mutation_operators.iteritems():
-        if k == ast.BinOp or k == ast.UnaryOp:
-            for op in v:
-                # mutate the original sut
-                operator = (k, op)
-                mutated_tree = mutator.mutate(operator)
-                ast.fix_missing_locations(mutated_tree)
+    for operator in mutation_operators.iteritems():
 
-                # generate a mutant module from mutated ast tree
-                mutant_module = generate_mutant_module(mutated_tree, source_module_shortname)
+        # make a copy of the original ast for mutation
+        original_tree_copy = deepcopy(original_tree)
 
-                # remove the source module from sys.modules
-                # del sys.modules[source_module_fullname]
+        print "\n********** Step 1: mutate target module **********\n"
+        # mutate the original sut
+        mutant_module = mutator.mutate(operator)
 
-                if tester.update_suite(source_module, mutant_module):
-                    test_result = tester.run()
+        # remove the source module from sys.modules
+        # del sys.modules[source_module_fullname]
 
-                    # todo: do further analaysis on test result
+        print "\n********** Step 2: run test suite on mutated module **********\n"
+        if tester.update_suite(module_under_test, mutant_module):
+            test_result = tester.run()
 
-            print "********** Mutation Test Done! **********\n"
-
-        break
+    print "********** Mutation Test Done! **********\n"
