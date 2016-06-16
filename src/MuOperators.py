@@ -164,6 +164,12 @@ class MutationOperator(object):
                 elif SliceStepIndexDeletion not in cls.mutation_operators[ast.Slice]:
                     cls.mutation_operators[ast.Slice].append(SliceStepIndexDeletion)
 
+            if name == 'RIL':
+                if ast.For not in cls.mutation_operators:
+                    cls.mutation_operators[ast.For] = [ReverseIterationLoop]
+                elif ReverseIterationLoop not in cls.mutation_operators[ast.For]:
+                    cls.mutation_operators[ast.For].append(ReverseIterationLoop)
+
         return cls.mutation_operators
 
 
@@ -589,7 +595,10 @@ class ReverseIterationLoop(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        pass
+        if node.__class__ is ast.For and node.iter is not None:
+            mutated_node = ast.Call(func=ast.Name(id='reversed', ctx=ast.Load()), args=[node.iter], keywords=[], starargs=None, kwargs=None)
+            node.iter = mutated_node
+        return node
 
 
 class StaticmethodDecoratorInsertion(MutationOperator):
@@ -645,7 +654,7 @@ if __name__ == "__main__":
     source_module = ModuleLoader.load_single_module(source_module_fullname)
 
     # build mutation operators
-    operators = ['SpIR']
+    operators = ['RIL']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
