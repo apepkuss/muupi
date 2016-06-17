@@ -94,9 +94,8 @@ class ASTMutator(ast.NodeTransformer):
 
         ast.fix_missing_locations(mutated_ast)
 
-        # print out the mutated tree
-        code = codegen.to_source(mutated_ast)
-        print code
+        # DEBUG: print out the mutated tree
+        # print_ast(mutated_ast)
 
         # generate a mutant module from mutated ast tree
         mutant_module = self.generate_mutant_module(mutated_ast)
@@ -345,6 +344,16 @@ class ASTMutator(ast.NodeTransformer):
         Mutate a single node by a specified operator
         """
         return operator.mutate(node)
+
+
+def print_ast(tree):
+    """
+    Print out a specified abstract syntax tree.
+    :param tree: abstract syntax tree to print
+    """
+    # print out the mutated tree
+    code = codegen.to_source(tree)
+    print code
 
 
 if __name__ == "__main__":

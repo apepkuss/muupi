@@ -13,9 +13,11 @@ class MutationOperator(object):
         return cls.__class__
 
     @classmethod
-    def build(cls, names):
-        if names == []: return None
-
+    def build(cls, names=None):
+        if names is None or len(names)==0:
+            names = ['AOD', 'AOR', 'ASR', 'BCR', 'COD', 'COI', 'CRP', \
+                     'EHD', 'EXS', 'LCR', 'LOD', 'LOR', 'OIL', 'RIL', \
+                     'ROR', 'SsIR', 'SeIR', 'SpIR', 'SVD', 'ZIL']
         cls.mutation_operators = {}
         for name in names:
             if name == 'AOD':
@@ -157,6 +159,7 @@ class MutationOperator(object):
                     cls.mutation_operators[ast.While] = [ZeroIterationLoop]
                 elif ZeroIterationLoop not in cls.mutation_operators[ast.While]:
                     cls.mutation_operators[ast.While].append(ZeroIterationLoop)
+
 
         return cls.mutation_operators
 

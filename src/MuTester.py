@@ -18,8 +18,8 @@ class MuTester(object):
 
     def run(self):
         """
-        Runs all test cases in a specified test suite on an sut.
-        Returns the raw test result.
+        Run all test cases in a specified test suite on target module under test.
+        :return: the raw test result
         """
         return unittest.TextTestRunner(verbosity=2).run(self.suite)
 

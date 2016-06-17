@@ -2,7 +2,6 @@ from MuManager import *
 from MuUtilities import *
 from MuOperators import *
 from astdump import *
-from copy import deepcopy
 
 import codegen
 import imp
@@ -28,12 +27,13 @@ if __name__ == "__main__":
 
     # run a unit test suite on original sut
     test_result = tester.run()
+    total_test_cases = test_result.testsRun
 
     # todo: do further analysis on the test result
 
     print "\n\n********** Phase 2: mutate target module with mutation operators and run test **********\n"
     # build mutation operators
-    operators = ['AOR']
+    operators = ['AOR', 'ZIL']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
@@ -41,29 +41,31 @@ if __name__ == "__main__":
     mutator = ASTMutator()
     original_tree = mutator.parse(module_under_test)
 
-    # print out the abstract syntax tree of target module
-    code = codegen.to_source(original_tree)
-    print code
+    # DEBUG: print out the abstract syntax tree of target module
+    # print_ast(original_tree)
 
     ast.fix_missing_locations(original_tree)
 
-    # mutate the original tree
-    operator = None
-    mutator_dict = {}
+    # number of killed mutants
+    mutant_killed = 0
+    # total number of mutants
+    mutant_total = 0
+    failures = []
     for operator in mutation_operators.iteritems():
-
-        # make a copy of the original ast for mutation
-        original_tree_copy = deepcopy(original_tree)
 
         print "\n********** Step 1: mutate target module **********\n"
         # mutate the original sut
-        mutant_module = mutator.mutate(operator)
-
-        # remove the source module from sys.modules
-        # del sys.modules[source_module_fullname]
+        mutant = mutator.mutate(operator)
+        mutant_total += 1
 
         print "\n********** Step 2: run test suite on mutated module **********\n"
-        if tester.update_suite(module_under_test, mutant_module):
+        if tester.update_suite(module_under_test, mutant):
             test_result = tester.run()
+            total_test_cases += test_result.testsRun
+            if test_result.failures is not None and len(test_result.failures) > 0:
+                failures += [failure[0] for failure in test_result.failures]
+                mutant_killed += 1
 
-    print "********** Mutation Test Done! **********\n"
+    mutation_score = mutant_killed * 1.0 / mutant_total
+    print "\n\nmutation score: " + str(mutation_score)
+    print "\n\n********** Mutation Test Done! **********\n"
