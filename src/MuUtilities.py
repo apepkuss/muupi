@@ -1,8 +1,13 @@
 import imp
 import importlib
+
 from MuOperators import *
 from MuTester import *
 from copy import deepcopy
+from difflib import *
+
+import codegen
+import time
 
 
 class ModuleLoader(object):
@@ -53,6 +58,7 @@ class ASTMutator(ast.NodeTransformer):
     def __init__(self):
         self.nodes_to_mutate = {}
         self.original_ast = None
+        self.mutated_ast = None
 
         # operator is a dict
         self.operator = None
@@ -86,19 +92,14 @@ class ASTMutator(ast.NodeTransformer):
 
         # make a copy of the original ast for mutation
         original_ast_copy = deepcopy(self.original_ast)
-
         ast.fix_missing_locations(original_ast_copy)
 
         # traverse the target ast tree
-        mutated_ast = self.visit(original_ast_copy)
-
-        ast.fix_missing_locations(mutated_ast)
-
-        # DEBUG: print out the mutated tree
-        # print_ast(mutated_ast)
+        self.mutated_ast = self.visit(original_ast_copy)
+        ast.fix_missing_locations(self.mutated_ast)
 
         # generate a mutant module from mutated ast tree
-        mutant_module = self.generate_mutant_module(mutated_ast)
+        mutant_module = self.generate_mutant_module(self.mutated_ast)
         return mutant_module
 
     def generate_mutant_module(self, mutated_ast, module_shortname=""):
@@ -354,6 +355,28 @@ def print_ast(tree):
     # print out the mutated tree
     code = codegen.to_source(tree)
     print code
+
+
+def make_diff(node1, node2):
+    timestamp = int(round(time.time() * 1000))
+
+    # write the original code to a file
+    original_code = codegen.to_source(node1)
+    write_to_file(str(timestamp)+"_original"+".py", original_code)
+
+    # write the mutated code to a file
+    mutated_code = codegen.to_source(node2)
+    write_to_file(str(timestamp)+"_mutant"+".py", mutated_code)
+
+    # write the diff result to a file
+    d = Differ()
+    res = ''.join(list(d.compare(original_code, mutated_code)))
+    write_to_file(str(timestamp)+"_diff_result"+".txt", res)
+
+
+def write_to_file(filename, text):
+    with open(filename, 'w') as sourcefile:
+        sourcefile.write(text)
 
 
 if __name__ == "__main__":

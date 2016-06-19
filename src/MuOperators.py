@@ -18,6 +18,7 @@ class MutationOperator(object):
             names = ['AOD', 'AOR', 'ASR', 'BCR', 'COD', 'COI', 'CRP', \
                      'EHD', 'EXS', 'LCR', 'LOD', 'LOR', 'OIL', 'RIL', \
                      'ROR', 'SsIR', 'SeIR', 'SpIR', 'SVD', 'ZIL']
+
         cls.mutation_operators = {}
         for name in names:
             if name == 'AOD':
@@ -159,7 +160,6 @@ class MutationOperator(object):
                     cls.mutation_operators[ast.While] = [ZeroIterationLoop]
                 elif ZeroIterationLoop not in cls.mutation_operators[ast.While]:
                     cls.mutation_operators[ast.While].append(ZeroIterationLoop)
-
 
         return cls.mutation_operators
 
@@ -542,8 +542,6 @@ class ZeroIterationLoop(MutationOperator):
         if node.__class__ is ast.For or node.__class__ is ast.While:
             node.body = [ast.Break()]
         return node
-
-
 
 
 ###################### todo: another 9 rules to be added ############################

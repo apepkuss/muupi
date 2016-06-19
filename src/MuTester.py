@@ -32,7 +32,6 @@ class MuTester(object):
         return False
 
 
-
 class CustomImporter(object):
 
     def __init__(self, module):
@@ -97,7 +96,6 @@ if __name__ == "__main__":
     # load test suite module
     suite_module_name = "sample.unittest_calculator"
     suite_module = ModuleLoader.load_single_module(suite_module_name)
-
 
     # run test
     test_result = MuTester.run(suite_module, None)

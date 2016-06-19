@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     print "\n\n********** Phase 2: mutate target module with mutation operators and run test **********\n"
     # build mutation operators
-    operators = ['AOR', 'ZIL']
+    operators = ['AOR']
     mutation_operators = MutationOperator.build(operators)
     assert mutation_operators is not None
 
@@ -51,11 +51,14 @@ if __name__ == "__main__":
 
         print "\n********** Step 1: mutate target module **********\n"
         # mutate the original sut
-        mutant = mutator.mutate(operator)
+        mutant_module = mutator.mutate(operator)
         mutant_total += 1
 
+        # diff two ast
+        make_diff(mutator.original_ast, mutator.mutated_ast)
+
         print "\n********** Step 2: run test suite on mutated module **********\n"
-        if tester.update_suite(module_under_test, mutant):
+        if tester.update_suite(module_under_test, mutant_module):
             test_result = tester.run()
             total_test_cases += test_result.testsRun
             if test_result.failures is not None and len(test_result.failures) > 0:
