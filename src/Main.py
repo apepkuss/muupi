@@ -3,10 +3,6 @@ from MuUtilities import *
 from MuOperators import *
 from astdump import *
 
-import codegen
-import imp
-import sys
-
 
 if __name__ == "__main__":
     manager = MuManager()

@@ -1,7 +1,7 @@
 import ast
 
 ##### for test ########
-from MuUtilities import *
+from src.MuUtilities import *
 import codegen
 #######################
 
