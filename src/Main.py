@@ -23,48 +23,52 @@ if __name__ == "__main__":
 
     # run a unit test suite on original sut
     test_result = tester.run()
-    total_test_cases = test_result.testsRun
 
-    # todo: do further analysis on the test result
+    if len(test_result.failures)>0 or len(test_result.errors) > 0:
+        print "The original test cases failed in test."
 
-    print "\n\n********** Phase 2: mutate target module with mutation operators and run test **********\n"
-    # build mutation operators
-    operators = ['AOR']
-    mutation_operators = MutationOperator.build(operators)
-    assert mutation_operators is not None
+    else:
+        # compute the total number of test cases
+        total_test_cases = test_result.testsRun
 
-    # build ast of target module
-    mutator = ASTMutator()
-    original_tree = mutator.parse(module_under_test)
+        print "\n\n********** Phase 2: mutate target module with mutation operators and run test **********\n"
+        # build mutation operators
+        operators = ['AOR']
+        mutation_operators = MutationOperator.build(operators)
+        assert mutation_operators is not None
 
-    # DEBUG: print out the abstract syntax tree of target module
-    # print_ast(original_tree)
+        # build ast of target module
+        mutator = ASTMutator()
+        original_tree = mutator.parse(module_under_test)
 
-    ast.fix_missing_locations(original_tree)
+        # DEBUG: print out the abstract syntax tree of target module
+        # print_ast(original_tree)
 
-    # number of killed mutants
-    mutant_killed = 0
-    # total number of mutants
-    mutant_total = 0
-    failures = []
-    for operator in mutation_operators.iteritems():
+        # ast.fix_missing_locations(original_tree)
 
-        print "\n********** Step 1: mutate target module **********\n"
-        # mutate the original sut
-        mutant_module = mutator.mutate(operator)
-        mutant_total += 1
+        # number of killed mutants
+        mutant_killed = 0
+        # total number of mutants
+        mutant_total = 0
+        failures = []
+        for operator in mutation_operators.iteritems():
 
-        # diff two ast
-        make_diff(mutator.original_ast, mutator.mutated_ast)
+            print "\n********** Step 1: mutate target module **********\n"
+            # mutate the original sut
+            mutant_module = mutator.mutate(operator)
+            mutant_total += 1
 
-        print "\n********** Step 2: run test suite on mutated module **********\n"
-        if tester.update_suite(module_under_test, mutant_module):
-            test_result = tester.run()
-            total_test_cases += test_result.testsRun
-            if test_result.failures is not None and len(test_result.failures) > 0:
-                failures += [failure[0] for failure in test_result.failures]
-                mutant_killed += 1
+            # diff two ast
+            make_diff(mutator.original_ast, mutator.mutated_ast)
 
-    mutation_score = mutant_killed * 1.0 / mutant_total
-    print "\n\nmutation score: " + str(mutation_score)
-    print "\n\n********** Mutation Test Done! **********\n"
+            print "\n********** Step 2: run test suite on mutated module **********\n"
+            if tester.update_suite(module_under_test, mutant_module):
+                test_result = tester.run()
+                total_test_cases += test_result.testsRun
+                if test_result.failures is not None and len(test_result.failures) > 0:
+                    failures += [failure[0] for failure in test_result.failures]
+                    mutant_killed += 1
+
+        mutation_score = mutant_killed * 1.0 / mutant_total
+        print "\n\nmutation score: " + str(mutation_score)
+        print "\n\n********** Mutation Test Done! **********\n"
