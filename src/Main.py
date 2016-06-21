@@ -44,8 +44,6 @@ if __name__ == "__main__":
         # DEBUG: print out the abstract syntax tree of target module
         # print_ast(original_tree)
 
-        # ast.fix_missing_locations(original_tree)
-
         # number of killed mutants
         mutant_killed = 0
         # total number of mutants
