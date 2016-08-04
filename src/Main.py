@@ -2,7 +2,8 @@ from MuManager import *
 from MuUtilities import *
 from MuOperators import *
 from astdump import *
-
+import imp
+import os
 
 if __name__ == "__main__":
     manager = MuManager()
@@ -10,7 +11,12 @@ if __name__ == "__main__":
     # load target module
     module_under_test_fullname = "sample.calculator"
     module_under_test_shortname = "calculator"
-    module_under_test = ModuleLoader.load_single_module(module_under_test_fullname)
+    # module_under_test = ModuleLoader.load_single_module(module_under_test_fullname)
+
+    if os.path.exists('../sample/calculator.pyc'):
+        os.remove('../sample/calculator.pyc')
+
+    module_under_test = imp.load_source(module_under_test_fullname, '../sample/calculator.py')
 
     # load test suite module
     suite_module_name = "sample.unittest_calculator"
