@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # run a unit test suite on original sut
     test_result = tester.run()
 
-    if len(test_result.failures)>0 or len(test_result.errors) > 0:
+    if len(test_result.failures) > 0 or len(test_result.errors) > 0:
         print "The original test cases failed in test."
 
     else:
@@ -36,10 +36,12 @@ if __name__ == "__main__":
         operators = ['AOR']
         mutation_operators = MutationOperator.build(operators)
         assert mutation_operators is not None
+        print "Loading mutation operators ...... Done.\n"
 
         # build ast of target module
         mutator = ASTMutator()
         original_tree = mutator.parse(module_under_test)
+        print "\nParsing abstract syntax tree ...... Done.\n"
 
         # DEBUG: print out the abstract syntax tree of target module
         # print_ast(original_tree)

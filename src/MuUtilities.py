@@ -1,3 +1,5 @@
+import imp
+import importlib
 
 from MuOperators import *
 from MuTester import *
@@ -356,6 +358,12 @@ def print_ast(tree):
 
 
 def make_diff(node1, node2):
+    """
+    Compare the original source code and mutant.
+    :param node1:
+    :param node2:
+    :return:
+    """
     timestamp = int(round(time.time() * 1000))
 
     # write the original code to a file
