@@ -1,8 +1,8 @@
-from MuManager import *
+from MutantGenerator import *
 from MuUtilities import *
 from MuOperators import *
+from MuAnalyzer import *
 from astdump import *
-
 
 
 if __name__ == "__main__":
