@@ -39,7 +39,7 @@ class MuManager(object):
         # load the module to mutate
         source_module_fullname = "sample.calculator"
         source_module_shortname = "calculator"
-        source_module = ModuleLoader.load_single_module(source_module_fullname)
+        source_module = MuUtilities.load_single_module(source_module_fullname)
 
         # build mutation operators
         operators = ['RIL']
@@ -60,7 +60,7 @@ class MuManager(object):
         mutator_dict = {}
         for operator in mutation_operators.iteritems():
             # mutate the original sut
-            mutated_tree = mutator.mutate(operator)
+            mutated_tree = mutator.mutate_bySingleOperator(operator)
             ast.fix_missing_locations(mutated_tree)
 
             # print out the mutated tree

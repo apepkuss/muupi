@@ -639,39 +639,3 @@ class SuperCallingInsertion(MutationOperator):
     def mutate(cls, node):
         pass
 
-
-if __name__ == "__main__":
-    # load the module to mutate
-    source_module_fullname = "sample.calculator"
-    source_module_shortname = "calculator"
-    source_module = ModuleLoader.load_single_module(source_module_fullname)
-
-    # build mutation operators
-    operators = ['RIL']
-    mutation_operators = MutationOperator.build(operators)
-    assert mutation_operators is not None
-
-    # build ast
-    mutator = ASTMutator()
-
-    original_tree = mutator.parse(source_module)
-    # # print out the original tree
-    # code = codegen.to_source(original_tree)
-    # print code
-    ast.fix_missing_locations(original_tree)
-
-    # mutate the original tree
-    operator = None
-    mutator_dict = {}
-    for operator in mutation_operators.iteritems():
-        # mutate the original sut
-        mutated_tree = mutator.mutate(operator)
-        ast.fix_missing_locations(mutated_tree)
-
-        # print out the mutated tree
-        code = codegen.to_source(mutated_tree)
-        print code
-
-
-
-    print "********** Operator Test Done! **********\n"

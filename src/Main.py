@@ -2,79 +2,64 @@ from MuManager import *
 from MuUtilities import *
 from MuOperators import *
 from astdump import *
-import imp
-import os
+
+
 
 if __name__ == "__main__":
-    manager = MuManager()
 
     # load target module
+    print "Loading target module ...... "
     module_under_test_fullname = "sample.calculator"
-    module_under_test_shortname = "calculator"
-    # module_under_test = ModuleLoader.load_single_module(module_under_test_fullname)
-
-    if os.path.exists('../sample/calculator.pyc'):
-        os.remove('../sample/calculator.pyc')
-
-    module_under_test = imp.load_source(module_under_test_fullname, '../sample/calculator.py')
+    module_under_test_path = "../sample/calculator.pyc"
+    module_under_test = MuUtilities.load_module(module_under_test_fullname, module_under_test_path)
+    print "Done.\n"
 
     # load test suite module
-    suite_module_name = "sample.unittest_calculator"
-    suite_module = ModuleLoader.load_single_module(suite_module_name)
-
-    # create an instance of MuTester
-    tester = MuTester(suite_module)
-
-    print "\n\n********** Phase 1: run test suite on target module **********\n"
+    print "Loading test suite module ...... "
+    suite_module_fullname = "sample.unittest_calculator"
+    suite_module_path = "../sample/unittest_calculator.pyc"
+    suite_module = MuUtilities.load_module(suite_module_fullname, suite_module_path)
+    print "Done.\n"
 
     # run a unit test suite on original sut
+    print "Running unit test cases against target module before mutation ......"
+    tester = MuTester(suite_module)
     test_result = tester.run()
+    print "Done.\n"
 
     if len(test_result.failures) > 0 or len(test_result.errors) > 0:
-        print "The original test cases failed in test."
+        print "Warning: current module to mutate failed in current unit test."
 
     else:
         # compute the total number of test cases
         total_test_cases = test_result.testsRun
 
-        print "\n\n********** Phase 2: mutate target module with mutation operators and run test **********\n"
+        print "Loading mutation operators ...... "
         # build mutation operators
         operators = ['AOR']
         mutation_operators = MutationOperator.build(operators)
         assert mutation_operators is not None
-        print "Loading mutation operators ...... Done.\n"
-
-        # build ast of target module
-        mutator = ASTMutator()
-        original_tree = mutator.parse(module_under_test)
-        print "\nParsing abstract syntax tree ...... Done.\n"
+        print "Done.\n"
 
         # DEBUG: print out the abstract syntax tree of target module
         # print_ast(original_tree)
 
-        # number of killed mutants
-        mutant_killed = 0
-        # total number of mutants
-        mutant_total = 0
-        failures = []
-        for operator in mutation_operators.iteritems():
+        # generate mutants from target module
+        print "Generating mutants from target module ...... "
+        mutants = MutantGenerator().mutate(module=module_under_test, operators=mutation_operators)
+        print "Done.\n"
 
-            print "\n********** Step 1: mutate target module **********\n"
-            # mutate the original sut
-            mutant_module = mutator.mutate(operator)
-            mutant_total += 1
+        # run test cases against mutated modules
+        print "Running test cases against mutants ...... "
+        results = []
+        for mutant in mutants:
+            if tester.update_suite(module_under_test, mutant):
+                results.append(tester.run())
+        print "Done.\n"
 
-            # diff two ast
-            make_diff(mutator.original_ast, mutator.mutated_ast)
+        # analyze test results
+        print "Computing mutation score ......"
+        MuAnalyzer.analyze(results)
+        print "Done.\n"
 
-            print "\n********** Step 2: run test suite on mutated module **********\n"
-            if tester.update_suite(module_under_test, mutant_module):
-                test_result = tester.run()
-                total_test_cases += test_result.testsRun
-                if test_result.failures is not None and len(test_result.failures) > 0:
-                    failures += [failure[0] for failure in test_result.failures]
-                    mutant_killed += 1
-
-        mutation_score = mutant_killed * 1.0 / mutant_total
-        print "\n\nmutation score: " + str(mutation_score)
         print "\n\n********** Mutation Test Done! **********\n"
