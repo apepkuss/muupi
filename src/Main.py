@@ -3,7 +3,7 @@ from MuUtilities import *
 from MuOperators import *
 from MuAnalyzer import *
 from astdump import *
-
+import multiprocessing as mp
 
 if __name__ == "__main__":
 
@@ -23,17 +23,22 @@ if __name__ == "__main__":
 
     # run a unit test suite on original sut
     print "Running unit test cases against target module before mutation ......"
-    tester = MuTester(suite_module)
-    test_result = tester.run()
+    # tester = MuTester(suite_module)
+    # test_result = tester.run()
+    # MuTester.load_test_suite_module(suite_module)
+    # test_result = MuTester.run_test_on_module()
+
+    tester = MuTester()
+    tester.load_test_suite_module(suite_module)
+    tester.start()
+    test_result = tester.get_result()
+    tester.terminate()
     print "Done.\n"
 
-    if len(test_result.failures) > 0 or len(test_result.errors) > 0:
+    if False: # len(test_result.failures) > 0 or len(test_result.errors) > 0:
         print "Warning: current module to mutate failed in current unit test."
 
     else:
-        # compute the total number of test cases
-        total_test_cases = test_result.testsRun
-
         print "Loading mutation operators ...... "
         # build mutation operators
         operators = ['AOR']
@@ -49,13 +54,18 @@ if __name__ == "__main__":
         mutants = MutantGenerator().mutate(module=module_under_test, operators=mutation_operators)
         print "Done.\n"
 
-        # run test cases against mutated modules
-        print "Running test cases against mutants ...... "
-        results = []
+        testers = []
         for mutant in mutants:
-            if tester.update_suite(module_under_test, mutant):
-                results.append(tester.run())
-        print "Done.\n"
+            tester = MuTester()
+            tester.load_test_suite_module(suite_module)
+            tester.set_mutant_module(mutated_module=mutant, original_module=module_under_test)
+            testers.append(tester)
+
+        results = []
+        for tester in testers:
+            tester.start()
+            results.append(tester.get_result())
+            tester.terminate()
 
         # analyze test results
         print "Computing mutation score ......"

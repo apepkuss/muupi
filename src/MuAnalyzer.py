@@ -11,11 +11,9 @@ class MuAnalyzer(object):
         mutant_killed = 0
         # total number of mutants
         mutant_total = len(results)
-        failures = []
 
         for result in results:
-            if result.failures is not None and len(result.failures) > 0:
-                failures += [failure[0] for failure in result.failures]
+            if len(result.failures) > 0 or len(result.errors) > 0:
                 mutant_killed += 1
 
         mutation_score = mutant_killed * 1.0 / mutant_total

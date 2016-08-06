@@ -1,14 +1,13 @@
 import imp
 import importlib
 import os
+import codegen
+import time
 
 from MuOperators import *
 from MuTester import *
 from copy import deepcopy
 from difflib import *
-
-import codegen
-import time
 
 
 class MuUtilities(object):
@@ -51,20 +50,30 @@ class MuUtilities(object):
         :param node2:
         :return:
         """
+        if not os.path.isdir('output'):
+            os.mkdir(os.path.curdir + '/output')
+        dest_dir = os.path.curdir + '/output'
+
         timestamp = int(round(time.time() * 1000))
 
         # write the original code to a file
         original_code = codegen.to_source(node1)
-        cls.write_to_file(str(timestamp) + "_original" + ".py", original_code)
+        filename = str(timestamp) + "_original" + ".py"
+        path = os.path.join(dest_dir, filename)
+        cls.write_to_file(path, original_code)
 
         # write the mutated code to a file
         mutated_code = codegen.to_source(node2)
-        cls.write_to_file(str(timestamp) + "_mutant" + ".py", mutated_code)
+        filename = str(timestamp) + "_mutant" + ".py"
+        path = os.path.join(dest_dir, filename)
+        cls.write_to_file(path, mutated_code)
 
         # write the diff result to a file
         d = Differ()
         res = ''.join(list(d.compare(original_code, mutated_code)))
-        cls.write_to_file(str(timestamp) + "_diff_result" + ".txt", res)
+        filename = str(timestamp) + "_diff_result" + ".txt"
+        path = os.path.join(dest_dir, filename)
+        cls.write_to_file(path, res)
 
     @classmethod
     def write_to_file(cls, filename, text):

@@ -1,7 +1,6 @@
 import ast
 import imp
 from MuUtilities import *
-
 from copy import deepcopy
 
 
@@ -48,8 +47,6 @@ class MutantGenerator(ast.NodeTransformer):
 
         mutated_modules = []
         for operator in operators.iteritems():
-
-            print "\n********** Step 1: mutate target module **********\n"
 
             # make a copy of the original ast for mutation
             original_ast_copy = deepcopy(self.original_ast)
