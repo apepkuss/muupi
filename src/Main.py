@@ -58,6 +58,7 @@ if __name__ == "__main__":
 
         results = []
         for tester in testers:
+            tester.start()
             # results.append(tester.get_result())
             # tester.terminate()
 
