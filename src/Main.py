@@ -23,11 +23,6 @@ if __name__ == "__main__":
 
     # run a unit test suite on original sut
     print "Running unit test cases against target module before mutation ......"
-    # tester = MuTester(suite_module)
-    # test_result = tester.run()
-    # MuTester.load_test_suite_module(suite_module)
-    # test_result = MuTester.run_test_on_module()
-
     tester = MuTester()
     tester.load_test_suite_module(suite_module)
     tester.start()
@@ -35,7 +30,7 @@ if __name__ == "__main__":
     tester.terminate()
     print "Done.\n"
 
-    if False: # len(test_result.failures) > 0 or len(test_result.errors) > 0:
+    if len(test_result.failures) > 0 or len(test_result.errors) > 0:
         print "Warning: current module to mutate failed in current unit test."
 
     else:
@@ -63,9 +58,12 @@ if __name__ == "__main__":
 
         results = []
         for tester in testers:
-            tester.start()
+            # results.append(tester.get_result())
+            # tester.terminate()
+
+        for tester in testers:
+            tester.join()
             results.append(tester.get_result())
-            tester.terminate()
 
         # analyze test results
         print "Computing mutation score ......"
