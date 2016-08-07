@@ -32,7 +32,6 @@ if __name__ == "__main__":
 
     if len(test_result.failures) > 0 or len(test_result.errors) > 0:
         print "Warning: current module to mutate failed in current unit test."
-
     else:
         print "Loading mutation operators ...... "
         # build mutation operators
