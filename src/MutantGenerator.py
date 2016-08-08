@@ -1,5 +1,6 @@
 import ast
 import imp
+import logging
 from MuUtilities import *
 from copy import deepcopy
 
@@ -53,8 +54,10 @@ class MutantGenerator(ast.NodeTransformer):
 
             # mutate the original sut
             self.mutated_ast = self.mutate_bySingleOperator(original_ast_copy, operator)
+            print codegen.to_source(self.mutated_ast)
             # generate a mutant module from mutated ast tree
-            mutated_modules.append(self.generate_mutant_module(self.mutated_ast))
+            mutated_module = self.generate_mutant_module(self.mutated_ast)
+            mutated_modules.append(mutated_module)
 
             # todo: diff two ast
             MuUtilities.make_diff(self.original_ast, self.mutated_ast)
@@ -239,6 +242,42 @@ class MutantGenerator(ast.NodeTransformer):
         self.dfs_visit(node)
         return node
 
+    def visit_Break(self, node):
+
+        if node.__class__ is self.operator[0]:
+            for operator_class in self.operator[1]:
+                print "Before mutation: " + codegen.to_source(node)
+                # mutate
+                mutated_node = self.mutate_single_node(node, operator_class)
+                if mutated_node is not None:
+                    break
+                print "After mutation: " + codegen.to_source(node)
+
+            if mutated_node is not None:
+                # visit child nodes
+                self.dfs_visit(mutated_node)
+                return mutated_node
+        self.dfs_visit(node)
+        return node
+
+    def visit_Continue(self, node):
+
+        if node.__class__ is self.operator[0]:
+            for operator_class in self.operator[1]:
+                print "Before mutation: " + codegen.to_source(node)
+                # mutate
+                mutated_node = self.mutate_single_node(node, operator_class)
+                if mutated_node is not None:
+                    break
+                print "After mutation: " + codegen.to_source(node)
+
+            if mutated_node is not None:
+                # visit child nodes
+                self.dfs_visit(mutated_node)
+                return mutated_node
+        self.dfs_visit(node)
+        return node
+
     def visit_Assign(self, node):
         if node.__class__ is self.operator[0]:
             mutated_node = None
@@ -321,3 +360,4 @@ class MutantGenerator(ast.NodeTransformer):
         Mutate a single node by a specified operator
         """
         return operator.mutate(node)
+

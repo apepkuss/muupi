@@ -3,21 +3,59 @@ from MuUtilities import *
 from MuOperators import *
 from MuAnalyzer import *
 from astdump import *
+from collections import namedtuple
+
 import multiprocessing as mp
+import argparse
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-m', '--module-fullname', type=str, default=None,
+                        help='Full name of module under test.')
+    parser.add_argument('-p', '--module-path', type=str, default=None,
+                        help='The path of source code of module under test.')
+    parser.add_argument('-M', '--tsmodule-fullname', type=str, default=None,
+                        help='Full name of test suite module.')
+    parser.add_argument('-P', '--tsmodule-path', type=str, default=None,
+                        help='The path of source code of test suite module.')
+
+    parsed_args = parser.parse_args(sys.argv[1:])
+    return parsed_args, parser
+
+
+def make_config(pargs, parser):
+    pdict = pargs.__dict__
+    return pdict
+
 
 if __name__ == "__main__":
 
+    # parsed_args, parser = parse_args()
+    # config = make_config(parsed_args, parser)
+    # print('Random testing using config={}'.format(config))
+
     # load target module
     print "Loading target module ...... "
-    module_under_test_fullname = "sample.calculator"
-    module_under_test_path = "../sample/calculator.pyc"
+    # todo: DO NOT REMOVE THE FOLLOWING TWO LINES
+    module_under_test_fullname = "sample.avl"
+    module_under_test_path = "../sample/avl.py"
+
+    # module_under_test_fullname = config["module_fullname"]
+    # module_under_test_path = config["module_path"]
+
     module_under_test = MuUtilities.load_module(module_under_test_fullname, module_under_test_path)
     print "Done.\n"
 
     # load test suite module
     print "Loading test suite module ...... "
+    # todo: DO NOT REMOVE THE FOLLOWING TWO LINES
     suite_module_fullname = "sample.unittest_calculator"
-    suite_module_path = "../sample/unittest_calculator.pyc"
+    suite_module_path = "../sample/unittest_calculator.py"
+
+    # suite_module_fullname = config["tsmodule_fullname"]
+    # suite_module_path = config["tsmodule_path"]
+
     suite_module = MuUtilities.load_module(suite_module_fullname, suite_module_path)
     print "Done.\n"
 
@@ -30,7 +68,7 @@ if __name__ == "__main__":
     tester.terminate()
     print "Done.\n"
 
-    if len(test_result.failures) > 0 or len(test_result.errors) > 0:
+    if False or len(test_result.failures) > 0 or len(test_result.errors) > 0:
         print "Warning: current module to mutate failed in current unit test."
     else:
         print "Loading mutation operators ...... "
@@ -71,3 +109,8 @@ if __name__ == "__main__":
         print "Done.\n"
 
         print "\n\n********** Mutation Test Done! **********\n"
+
+
+
+
+

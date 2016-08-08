@@ -9,6 +9,7 @@ from MuTester import *
 from copy import deepcopy
 from difflib import *
 
+import traceback
 
 class MuUtilities(object):
 
@@ -18,12 +19,16 @@ class MuUtilities(object):
         Load a single module by full module name
         """
         module = None
+        # if module_path[-3:] == ".py":
+        #     module_path = module_path.replace(".py", ".pyc")
         try:
-            if os.path.exists(module_path):
-                os.remove(module_path)
+            if os.path.exists(module_path[:len(module_path)-3] + '.pyc'):
+                os.remove(module_path[:len(module_path)-3] + '.pyc')
+            # module = imp.load_source(module_fullname, module_path)
             module = importlib.import_module(module_fullname)
         except ImportError:
-            pass
+            print "ImportError: faild to import " + module_fullname + " from " + module_path
+            traceback.print_exc(file=sys.stdout)
         return module
 
     @classmethod
