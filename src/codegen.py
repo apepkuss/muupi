@@ -561,7 +561,7 @@ class SourceGenerator(NodeVisitor):
                 self.write(' if ')
                 self.visit(if_)
 
-    def visit_excepthandler(self, node):
+    def visit_ExceptHandler(self, node):
         self.newline(node)
         self.write('except')
         if node.type is not None:
