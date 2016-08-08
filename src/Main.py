@@ -38,8 +38,8 @@ if __name__ == "__main__":
     # load target module
     print "Loading target module ...... "
     # todo: DO NOT REMOVE THE FOLLOWING TWO LINES
-    module_under_test_fullname = "sample.avl"
-    module_under_test_path = "../sample/avl.py"
+    module_under_test_fullname = "sample.calculator"
+    module_under_test_path = "../sample/calculator.py"
 
     # module_under_test_fullname = config["module_fullname"]
     # module_under_test_path = config["module_path"]

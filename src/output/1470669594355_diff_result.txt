@@ -1,0 +1,150 @@
+  c  l  a  s  s     C  a  l  c  u  l  a  t  o  r  (  o  b  j  e  c  t  )  :  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     a  d  d  (  c  l  s  ,     x  ,     y  )  :  
+                          s  u  m     =     x     +     y  
+                          r  e  t  u  r  n     s  u  m  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     s  u  b  t  r  a  c  t  (  c  l  s  ,     x  ,     y  )  :  
+                          d  i  f  f     =     x     -     y  
+                          r  e  t  u  r  n     d  i  f  f  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     m  u  l  t  i  p  l  y  (  c  l  s  ,     x  ,     y  )  :  
+                          p  r  o  d  u  c  t     =     x     *     y  
+                          r  e  t  u  r  n     p  r  o  d  u  c  t  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     d  i  v  i  d  e  (  c  l  s  ,     x  ,     y  )  :  
+                          i  f     (  y     =  =     0  )  :  
+                                      r  e  t  u  r  n     N  o  n  e  
+                          q  u  o  t  i  e  n  t     =     x     /     y  
+                          r  e  t  u  r  n     q  u  o  t  i  e  n  t  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     n  e  g  a  t  e  (  c  l  s  ,     x  )  :  
+                          r  e  t  u  r  n     (- -+ +  x  )  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     f  l  o  o  r  D  i  v  (  c  l  s  ,     x  ,     y  )  :  
+                          t  r  y  :  
+                                      q  u  o  t  i  e  n  t     =     x     /  /     y  
+                                      r  e  t  u  r  n     q  u  o  t  i  e  n  t  
+                          e  x  c  e  p  t     Z  e  r  o  D  i  v  i  s  i  o  n  E  r  r  o  r  :  
+                                      p  r  i  n  t     '  d  i  v  i  d  e  d     b  y     z  e  r  o  '  
+                          e  x  c  e  p  t  :  
+                                      p  r  i  n  t     '  u  n  k  n  o  w  n     e  x  c  e  p  t  i  o  n  '  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     f  l  o  o  r  D  i  v  A  s  s  i  g  n  (  c  l  s  ,     x  ,     y  )  :  
+                          i  f     (  y     =  =     0  )  :  
+                                      r  e  t  u  r  n     N  o  n  e  
+                          x     /  /  =     y  
+                          r  e  t  u  r  n     x  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     s  u  m  _  a  l  l  (  c  l  s  ,     n  u  m  s  )  :  
+                          n     =     l  e  n  (  n  u  m  s  )  
+                          i  f     (  n  o  t     (  n     >     0  )  )  :  
+                                      r  e  t  u  r  n     0  
+                          r  e  s     =     0  
+                          f  o  r     i     i  n     x  r  a  n  g  e  (  n  )  :  
+                                      f  l  a  g     =     (  n  u  m  s  [  i  ]     =  =     0  )  
+                                      i  f     f  l  a  g  :  
+                                                  c  o  n  t  i  n  u  e  
+                                      r  e  s     +  =     n  u  m  s  [  i  ]  
+                          r  e  t  u  r  n     r  e  s  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     s  u  m  _  a  l  l  _  w  h  i  l  e  (  c  l  s  ,     n  u  m  s  )  :  
+                          r  e  s     =     0  
+                          i     =     0  
+                          w  h  i  l  e     (  i     <     l  e  n  (  n  u  m  s  )  )  :  
+                                      r  e  s     +  =     n  u  m  s  [  i  ]  
+                                      i     +  =     1  
+                          r  e  t  u  r  n     r  e  s  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     g  e  t  _  v  e  r  s  i  o  n  (  c  l  s  )  :  
+                          v  e  r  s  i  o  n     =     '  1  .  2  .  3  '  
+                          r  e  t  u  r  n     v  e  r  s  i  o  n  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     d  i  v  i  d  e  _  p  o  s  i  t  i  v  e  I  n  t  (  c  l  s  ,     x  ,     y  )  :  
+                          i  f     (  (  x     >     0  )     a  n  d     (  y     >     0  )  )  :  
+                                      q  u  o  t  i  e  n  t     =     x     /     y  
+                                      r  e  t  u  r  n     q  u  o  t  i  e  n  t  
+                          e  l  s  e  :  
+                                      r  e  t  u  r  n     N  o  n  e  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     b  i  t  _  n  e  g  a  t  e  (  c  l  s  ,     x  )  :  
+                          r  e  t  u  r  n     (  ~  x  )  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     b  i  t  _  a  n  d  (  c  l  s  ,     x  ,     y  )  :  
+                          r  e  t  u  r  n     x     &     y  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     b  i  t  _  o  r  (  c  l  s  ,     x  ,     y  )  :  
+                          r  e  t  u  r  n     x     |     y  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     b  i  t  _  x  o  r  (  c  l  s  ,     x  ,     y  )  :  
+                          r  e  t  u  r  n     x     ^     y  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     b  i  t  _  l  e  f  t  _  s  h  i  f  t  (  c  l  s  ,     x  )  :  
+                          r  e  t  u  r  n     x     <  <     1  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     b  i  t  _  r  i  g  h  t  _  s  h  i  f  t  (  c  l  s  ,     x  )  :  
+                          r  e  t  u  r  n     x     >  >     1  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     s  u  m  _  o  f  _  c  o  l  l  e  c  t  i  o  n  (  c  l  s  ,     n  u  m  s  ,     s  t  a  r  t  ,     e  n  d  ,     s  t  e  p  )  :  
+                          r  e  s     =     0  
+                          i  f     (  l  e  n  (  n  u  m  s  )     >     0  )  :  
+                                      f  o  r     a  n  u  m     i  n     n  u  m  s  [  s  t  a  r  t  :  e  n  d  :  s  t  e  p  ]  :  
+                                                  r  e  s     +  =     a  n  u  m  
+                          r  e  t  u  r  n     r  e  s  
+  
+  
+  c  l  a  s  s     S  c  i  e  n  t  i  f  i  c  C  a  l  c  u  l  a  t  o  r  (  C  a  l  c  u  l  a  t  o  r  )  :  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     a  d  d  (  c  l  s  ,     x  ,     y  )  :  
+                          '  \  n                          O  v  e  r  r  i  d  e     a  d  d     f  u  n  c  t  i  o  n     d  e  f  i  n  e  d     i  n     C  a  l  c  u  l  a  t  o  r  \  n                          :  p  a  r  a  m     x  :  \  n                          :  p  a  r  a  m     y  :  \  n                          :  r  e  t  u  r  n  :  \  n                          '  
+                          p  a  s  s  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     s  u  b  t  r  a  c  t  (  c  l  s  ,     x  ,     y  )  :  
+                          '  \  n                          O  v  e  r  r  i  d  e     s  u  b  t  r  a  c  t     f  u  n  c  t  i  o  n     d  e  f  i  n  e  d     i  n     C  a  l  c  u  l  a  t  o  r  \  n                          :  p  a  r  a  m     x  :  \  n                          :  p  a  r  a  m     y  :  \  n                          :  r  e  t  u  r  n  :  \  n                          '  
+                          p  a  s  s  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     m  u  l  t  i  p  l  y  (  c  l  s  ,     x  ,     y  )  :  
+                          '  \  n                          O  v  e  r  r  i  d  e     m  u  l  t  i  p  l  y     f  u  n  c  t  i  o  n     d  e  f  i  n  e  d     i  n     C  a  l  c  u  l  a  t  o  r  \  n                          :  p  a  r  a  m     x  :  \  n                          :  p  a  r  a  m     y  :  \  n                          :  r  e  t  u  r  n  :  \  n                          '  
+                          p  a  s  s  
+  
+              @  c  l  a  s  s  m  e  t  h  o  d  
+              d  e  f     d  i  v  i  d  e  (  c  l  s  ,     x  ,     y  )  :  
+                          '  \  n                          O  v  e  r  r  i  d  e     d  i  v  i  d  e     f  u  n  c  t  i  o  n     d  e  f  i  n  e  d     i  n     C  a  l  c  u  l  a  t  o  r  \  n                          :  p  a  r  a  m     x  :  \  n                          :  p  a  r  a  m     y  :  \  n                          :  r  e  t  u  r  n  :  \  n                          '  
+                          p  a  s  s  
+  
+  
+  c  l  a  s  s     C  a  l  c  u  l  a  t  o  r  T  e  s  t  (  o  b  j  e  c  t  )  :  
+  
+              d  e  f     _  _  i  n  i  t  _  _  (  s  e  l  f  )  :  
+                          s  e  l  f  .  n  a  m  e     =     '  n  a  m  e  _  v  a  l  u  e  '  
+                          t  e  x  t     =     s  e  l  f  .  n  a  m  e  
+  
+              d  e  f     g  e  t  _  n  a  m  e  (  s  e  l  f  )  :  
+                          r  e  t  u  r  n     s  e  l  f  .  n  a  m  e  
+  
+  d  e  f     m  e  t  h  o  d  _  n  a  m  e  (  )  :  
+              p  r  i  n  t     '  t  h  i  s     i  s     a     m  e  t  h  o  d  '  
+  i  f     (  _  _  n  a  m  e  _  _     =  =     '  _  _  m  a  i  n  _  _  '  )  :  
+              r  e  s     =     C  a  l  c  u  l  a  t  o  r  .  f  l  o  o  r  D  i  v  (  5  ,     2  )  
+              p  r  i  n  t     r  e  s
