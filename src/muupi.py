@@ -77,6 +77,7 @@ if __name__ == "__main__":
         module_under_test_path = config.module_path
 
         module_under_test = MuUtilities.load_module(module_under_test_fullname, module_under_test_path)
+        assert module_under_test is not None
         print "Done.\n"
 
         print "Loading mutation operators ...... "
