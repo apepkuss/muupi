@@ -22,13 +22,14 @@ class MuUtilities(object):
         # if module_path[-3:] == ".py":
         #     module_path = module_path.replace(".py", ".pyc")
         try:
-            if os.path.exists(module_path[:len(module_path)-3] + '.pyc'):
-                os.remove(module_path[:len(module_path)-3] + '.pyc')
+            # if os.path.exists(module_path[:len(module_path)-3] + '.pyc'):
+            #     os.remove(module_path[:len(module_path)-3] + '.pyc')
             # module = imp.load_source(module_fullname, module_path)
             module = importlib.import_module(module_fullname)
         except ImportError:
-            print "ImportError: faild to import " + module_fullname + " from " + module_path
+            print "ImportError: faild to import " + module_fullname
             traceback.print_exc(file=sys.stdout)
+        assert module is not None
         return module
 
     @classmethod
