@@ -3,13 +3,14 @@ import importlib
 import os
 import codegen
 import time
+import config
+import traceback
 
 from MuOperators import *
 from MuTester import *
 from copy import deepcopy
 from difflib import *
 
-import traceback
 
 class MuUtilities(object):
 
@@ -49,7 +50,7 @@ class MuUtilities(object):
         return getattr(module, class_str)
 
     @classmethod
-    def make_diff(cls, node1, node2):
+    def make_diff(cls, node1, node2, operator_name):
         """
         Compare the original source code and mutant.
         :param node1:
@@ -64,20 +65,20 @@ class MuUtilities(object):
 
         # write the original code to a file
         original_code = codegen.to_source(node1)
-        filename = str(timestamp) + "_original" + ".py"
+        filename = operator_name + "_original_" + str(timestamp) + ".py"
         path = os.path.join(dest_dir, filename)
         cls.write_to_file(path, original_code)
 
         # write the mutated code to a file
         mutated_code = codegen.to_source(node2)
-        filename = str(timestamp) + "_mutant" + ".py"
+        filename = operator_name + "_mutant_" + str(timestamp) + ".py"
         path = os.path.join(dest_dir, filename)
         cls.write_to_file(path, mutated_code)
 
         # write the diff result to a file
         d = Differ()
         res = ''.join(list(d.compare(original_code, mutated_code)))
-        filename = str(timestamp) + "_diff_result" + ".txt"
+        filename = operator_name + "_diff_" + str(timestamp) + ".py"
         path = os.path.join(dest_dir, filename)
         cls.write_to_file(path, res)
 
@@ -95,6 +96,10 @@ class MuUtilities(object):
         # print out the mutated tree
         code = codegen.to_source(tree)
         print code
+
+    @classmethod
+    def save_change(cls, orignal, mutated):
+        config.changes.append((orignal, mutated))
 
 
 

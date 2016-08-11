@@ -50,6 +50,8 @@ def generator_factory(generator):
         return None
     elif generator == "dfsmodelchecker":
         return None
+    elif generator == "choose for me":
+        return None
     else:
         return None
 
@@ -82,9 +84,9 @@ if __name__ == "__main__":
 
         print "Loading mutation operators ...... "
         # build mutation operators
-        operators = ['AOR']
+        operators = None #['ZIL']
         mutation_operators = MutationOperator.build(operators)
-        assert mutation_operators is not None
+        assert len(mutation_operators) > 0
         print "Done.\n"
 
         # DEBUG: print out the abstract syntax tree of target module

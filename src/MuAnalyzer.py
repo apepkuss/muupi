@@ -7,6 +7,8 @@ class MuAnalyzer(object):
         """
         Analyzes a test result, computes mutation scores, and makes a final test report.
         """
+        if len(results) == 0:
+            return
         # number of killed mutants
         mutant_killed = 0
         # total number of mutants

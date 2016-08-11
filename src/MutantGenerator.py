@@ -1,6 +1,8 @@
 import ast
+import config
 import imp
 import logging
+
 from MuUtilities import *
 from copy import deepcopy
 
@@ -47,20 +49,24 @@ class MutantGenerator(ast.NodeTransformer):
         self.original_ast = self.parse(module)
 
         mutated_modules = []
-        for operator in operators.iteritems():
+        for operator in operators:
 
             # make a copy of the original ast for mutation
             original_ast_copy = deepcopy(self.original_ast)
 
+            config.mutated = False
+
             # mutate the original sut
             self.mutated_ast = self.mutate_bySingleOperator(original_ast_copy, operator)
-            print codegen.to_source(self.mutated_ast)
-            # generate a mutant module from mutated ast tree
-            mutated_module = self.generate_mutant_module(self.mutated_ast)
-            mutated_modules.append(mutated_module)
+            # print codegen.to_source(self.mutated_ast)
 
-            # todo: diff two ast
-            MuUtilities.make_diff(self.original_ast, self.mutated_ast)
+            # generate a mutant module from mutated ast tree
+            if config.mutated:
+                mutated_module = self.generate_mutant_module(self.mutated_ast)
+                mutated_modules.append(mutated_module)
+
+                # todo: diff two ast
+                MuUtilities.make_diff(self.original_ast, self.mutated_ast, operator[1].name())
 
         return mutated_modules
 
@@ -73,7 +79,6 @@ class MutantGenerator(ast.NodeTransformer):
         """
         self.operator = operator
 
-        # ast.fix_missing_locations(original_ast_copy)
         ast.fix_missing_locations(tree)
         # traverse the target ast tree and mutate interesting node
         mutated_ast = self.visit(tree)
@@ -114,37 +119,68 @@ class MutantGenerator(ast.NodeTransformer):
 
         return wrapper
 
+    def visit_Num(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_Str(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_UAdd(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_USub(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_BitAnd(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_BitOr(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_BitXor(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_LShift(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_RShift(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_And(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_Or(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
     def visit_Attribute(self, node):
-
-        if node.__class__ is self.operator[0]:
-            mutated_node = None
-            for operator_class in self.operator[1]:
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-                return mutated_node
-
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
     def visit_Compare(self, node):
-
-        if node.__class__ is self.operator[0]:
-            mutated_node = None
-            for operator_class in self.operator[1]:
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-                return mutated_node
-
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
@@ -152,18 +188,7 @@ class MutantGenerator(ast.NodeTransformer):
         """
         Visit and mutate a unary operation
         """
-        if node.__class__ is self.operator[0]:
-            mutated_node = None
-            for operator_class in self.operator[1]:
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-                return mutated_node
-
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
@@ -171,18 +196,7 @@ class MutantGenerator(ast.NodeTransformer):
         """
         Visit and mutate a binary operation
         """
-        if node.__class__ is self.operator[0]:
-            mutated_node = None
-            for operator_class in self.operator[1]:
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-                return mutated_node
-
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
@@ -192,172 +206,104 @@ class MutantGenerator(ast.NodeTransformer):
         :param node:
         :return:
         """
-        if node.__class__ is self.operator[0]:
-            mutated_node = None
-            for operator_class in self.operator[1]:
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
 
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-                return mutated_node
+    def visit_IfExp(self, node):
+        """
+        Visit and mutate if expression
+        :param node:
+        :return:
+        """
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_Assert(self, node):
+        """
+        Visit and mutate if expression
+        :param node:
+        :return:
+        """
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
     def visit_For(self, node):
-
-        if node.__class__ is self.operator[0]:
-            mutated_node = None
-            for operator_class in self.operator[1]:
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
-
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-                return mutated_node
-
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
     def visit_While(self, node):
-
-        if node.__class__ is self.operator[0]:
-
-            for operator_class in self.operator[1]:
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
-
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-                return mutated_node
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
     def visit_Break(self, node):
-
-        if node.__class__ is self.operator[0]:
-            for operator_class in self.operator[1]:
-                print "Before mutation: " + codegen.to_source(node)
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
-                print "After mutation: " + codegen.to_source(node)
-
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-                return mutated_node
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
     def visit_Continue(self, node):
-
-        if node.__class__ is self.operator[0]:
-            for operator_class in self.operator[1]:
-                print "Before mutation: " + codegen.to_source(node)
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
-                print "After mutation: " + codegen.to_source(node)
-
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-                return mutated_node
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
     def visit_Assign(self, node):
-        if node.__class__ is self.operator[0]:
-            mutated_node = None
-            for operator_class in self.operator[1]:
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
 
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-
+    def visit_AugAssign(self, node):
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
     def visit_Slice(self, node):
-        if node.__class__ is self.operator[0]:
-            mutated_node = None
-            for operator_class in self.operator[1]:
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
-
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
+    def visit_TryFinally(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        if node:
+            self.dfs_visit(node)
+        return node
+
+    # def visit_TryExcept(self, node):
+    #     node = self.mutate_single_node(node, self.operator)
+    #     if node:
+    #         self.dfs_visit(node)
+    #     return node
+
     def visit_ExceptHandler(self, node):
-
-        if node.__class__ is self.operator[0]:
-            mutated_node = None
-            for operator_class in self.operator[1]:
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-
-        self.dfs_visit(node)
+        node = self.mutate_single_node(node, self.operator)
+        if node:
+            self.dfs_visit(node)
         return node
 
     def visit_FunctionDef(self, node):
-
-        if node.__class__ is self.operator[0]:
-            mutated_node = None
-            for operator_class in self.operator[1]:
-                # mutate
-                mutated_node = self.mutate_single_node(node, operator_class)
-                if mutated_node is not None:
-                    break
-            if mutated_node is not None:
-                # visit child nodes
-                self.dfs_visit(mutated_node)
-
-        # visit child nodes
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
     def visit_ClassDef(self, node):
-
-        # if ast.ClassDef not in self.nodes_to_mutate:
-        #     self.nodes_to_mutate[ast.ClassDef] = [(node.name, node)]
-        # else:
-        #     self.nodes_to_mutate[ast.ClassDef].append((node.name, node))
-
-        # visit child nodes
+        node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
-
         return node
 
     def mutate_single_node(self, node, operator):
         """
         Mutate a single node by a specified operator
         """
-        return operator.mutate(node)
+        if node.__class__ is operator[0]:
+            # mutate
+            mutated_node = operator[1].mutate(node)
+
+            if config.mutated:
+                node = mutated_node
+
+        return node
+
 
