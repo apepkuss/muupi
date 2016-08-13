@@ -13,7 +13,7 @@ from collections import namedtuple
 current_working_dir = os.getcwd()
 sys.path.append(current_working_dir)
 
-import sut as SUT
+import sample.sut as SUT
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -138,22 +138,22 @@ def handle_failure(test, msg, checkFail, newCov = False):
     if not newCov:
         failCount += 1
         print msg
-        f = sut.failure()
+        f = sample.sut.failure()
         print "ERROR:",f
         print "TRACEBACK:"
         traceback.print_tb(f[2])
-        sut.saveTest(test,config.output+".full")
+        sample.sut.saveTest(test, config.output + ".full")
     else:
         print "Handling new coverage for quick testing"
-        snew = sut.newCurrStatements()
+        snew = sample.sut.newCurrStatements()
         for s in snew:
             print "NEW STATEMENT",s
-        bnew = sut.newCurrBranches()
+        bnew = sample.sut.newCurrBranches()
         for b in bnew:
             print "NEW BRANCH",b
-        trep = sut.replay(test,catchUncaught=True,checkProp=(not config.ignoreprops))
+        trep = sample.sut.replay(test, catchUncaught=True, checkProp=(not config.ignoreprops))
         sremove = []
-        scov = sut.currStatements()
+        scov = sample.sut.currStatements()
         for s in snew:
             if s not in scov:
                 print "REMOVING",s
@@ -161,68 +161,68 @@ def handle_failure(test, msg, checkFail, newCov = False):
         for s in sremove:
             snew.remove(s)
         bremove = []
-        bcov = sut.currBranches()
+        bcov = sample.sut.currBranches()
         for b in bnew:
             if b not in bcov:
                 print "REMOVING",b
                 bremove.append(b)
         for b in bremove:
             bnew.remove(b)
-        beforeReduceS = set(sut.allStatements())
-        beforeReduceB = set(sut.allBranches())
+        beforeReduceS = set(sample.sut.allStatements())
+        beforeReduceB = set(sample.sut.allBranches())
     print "Original test has",len(test),"steps"
     cloudMatch = False
     if not config.full:
         if not checkFail:
             if config.noExceptionMatch:
-                failProp = sut.fails
+                failProp = sample.sut.fails
             else:
-                failProp = lambda x: sut.fails(x,failure=f)                
+                failProp = lambda x: sample.sut.fails(x, failure=f)
         else:
             if config.noExceptionMatch:
-                failProp = sut.failsCheck
+                failProp = sample.sut.failsCheck
             else:
-                failProp = lambda x: sut.failsCheck(x,failure=f)
+                failProp = lambda x: sample.sut.failsCheck(x, failure=f)
         if newCov:
-            failProp = sut.coversAll(snew,bnew)
+            failProp = sample.sut.coversAll(snew, bnew)
         print "REDUCING..."
         startReduce = time.time()
         original = test
-        test = sut.reduce(test, failProp, True, config.keep)
+        test = sample.sut.reduce(test, failProp, True, config.keep)
         if not newCov:
-            sut.saveTest(test,config.output+".reduced")        
+            sample.sut.saveTest(test, config.output + ".reduced")
         print "Reduced test has",len(test),"steps"
         print "REDUCED IN",time.time()-startReduce,"SECONDS"
-        sut.prettyPrintTest(test)
+        sample.sut.prettyPrintTest(test)
         if config.essentials:
             print "FINDING ESSENTIAL ELEMENTS OF REDUCED TEST"
-            (canRemove, cannotRemove) = sut.reduceEssentials(test, original, failProp, True, config.keep)
+            (canRemove, cannotRemove) = sample.sut.reduceEssentials(test, original, failProp, True, config.keep)
             print len(canRemove),len(cannotRemove)
             for (c,reducec) in canRemove:
                 print "CAN BE REMOVED:",map(lambda x:x[0], c)
                 i = 0
-                sut.prettyPrintTest(reducec)
+                sample.sut.prettyPrintTest(reducec)
         sys.stdout.flush()
         if config.normalize:
             startSimplify = time.time()
             print "NORMALIZING..."
-            test = sut.normalize(test, failProp, True, config.keep, verbose = True, speed = config.speed, noReassigns = config.noreassign)
+            test = sample.sut.normalize(test, failProp, True, config.keep, verbose = True, speed = config.speed, noReassigns = config.noreassign)
             print "Normalized test has",len(test),"steps"
             print "NORMALIZED IN",time.time()-startSimplify,"SECONDS"
         if (config.gendepth != None) and (test not in map(lambda x:x[0],failures)) and (test not in cloudFailures):
             startCheckCloud = time.time()
             print "GENERATING GENERALIZATION CLOUD"
-            (cloudFound,matchTest,thisCloud) = sut.generalize(test, failProp, silent=True, returnCollect=True, depth=config.gendepth, targets = allClouds)
+            (cloudFound,matchTest,thisCloud) = sample.sut.generalize(test, failProp, silent=True, returnCollect=True, depth=config.gendepth, targets = allClouds)
             print "CLOUD GENERATED IN",time.time()-startCheckCloud,"SECONDS"
             print "CLOUD LENGTH =",len(thisCloud)
             if cloudFound:
                 print "CLOUD MATCH",
                 faili = 0
                 for (cfailbase,err) in failures:
-                    cfail = sut.captureReplay(cfailbase)
+                    cfail = sample.sut.captureReplay(cfailbase)
                     if matchTest in failCloud[cfail]:
                         print "THIS TEST CAN BE CONVERTED TO:"
-                        sut.prettyPrintTest(matchTest)
+                        sample.sut.prettyPrintTest(matchTest)
                         print "MATCHING FAILURE",faili
                         break
                     faili += 1
@@ -231,7 +231,7 @@ def handle_failure(test, msg, checkFail, newCov = False):
         if config.generalize and (test not in map(lambda x:x[0],failures)):
             startGeneralize = time.time()
             print "GENERALIZING..."
-            sut.generalize(test, failProp, verbose = True)
+            sample.sut.generalize(test, failProp, verbose = True)
             print "GENERALIZED IN",time.time()-startGeneralize,"SECONDS"            
         reduceTime += time.time()-startReduce
 
@@ -242,10 +242,10 @@ def handle_failure(test, msg, checkFail, newCov = False):
         if (outname != None) and config.multiple and not newCov:
             outname += ("." + str(failCount))
         if config.quickTests and newCov:
-            for s in sut.allStatements():
+            for s in sample.sut.allStatements():
                 if s not in beforeReduceS:
                     print "NEW STATEMENT FROM REDUCTION",s
-            for b in sut.allBranches():
+            for b in sample.sut.allBranches():
                 if b not in beforeReduceB:
                     print "NEW BRANCH FROM REDUCTION",b
             outname = "quicktest." + str(quickCount)
@@ -253,31 +253,31 @@ def handle_failure(test, msg, checkFail, newCov = False):
         if outname != None:
             outf = open(outname,'w')
     if config.failedLogging != None:
-        sut.setLog(config.failedLogging)
+        sample.sut.setLog(config.failedLogging)
     print
     print "FINAL VERSION OF TEST, WITH LOGGED REPLAY:"
     i = 0
-    sut.restart()
+    sample.sut.restart()
     for s in test:
         steps = "# STEP " + str(i)
-        print sut.prettyName(s[0]).ljust(80-len(steps),' '),steps
-        sut.safely(s)
+        print sample.sut.prettyName(s[0]).ljust(80 - len(steps), ' '),steps
+        sample.sut.safely(s)
         if checkFail:
-            sut.check()
+            sample.sut.check()
         i += 1
         if outf != None:
-            outf.write(sut.serializable(s)+"\n")
+            outf.write(sample.sut.serializable(s) + "\n")
     if not newCov:
         if config.localize:
-            for s in sut.currStatements():
+            for s in sample.sut.currStatements():
                 if s not in localizeSFail:
                     localizeSFail[s] = 0
                 localizeSFail[s] += 1
-            for b in sut.currBranches():
+            for b in sample.sut.currBranches():
                 if b not in localizeBFail:
                     localizeBFail[b] = 0
                 localizeBFail[b] += 1
-        f = sut.failure()
+        f = sample.sut.failure()
         if f != None:
             print "ERROR:",f
             print "TRACEBACK:"
@@ -292,9 +292,9 @@ def handle_failure(test, msg, checkFail, newCov = False):
             print "NEW FAILURE IS IDENTICAL TO PREVIOUSLY FOUND FAILURE, NOT STORING"
             repeatCount += 1
         else:
-            failures.append((test,sut.failure()))
+            failures.append((test, sample.sut.failure()))
             if config.gendepth != None:
-                failCloud[sut.captureReplay(test)] = thisCloud
+                failCloud[sample.sut.captureReplay(test)] = thisCloud
                 for c in thisCloud:
                     allClouds[c] = True
             print "FAILURE IS NEW, STORING; NOW",len(failures),"DISTINCT FAILURES"
@@ -334,21 +334,21 @@ def tryExploit():
         buildActivePool()
         if len(activePool) == 0:
             return
-        sut.replay(R.choice(activePool))
+        sample.sut.replay(R.choice(activePool))
         if config.total:
-            for a in sut.test():
+            for a in sample.sut.test():
                 fulltest.write(a[0] + "\n")
                 fulltest.flush()
         if config.replayable:
-            for a in sut.test():
+            for a in sample.sut.test():
                 currtest.write(a[0] + "\n")
                 currtest.flush()
             
 def collectExploitable():
-    if (len(sut.newBranches()) != 0) or (len(sut.newStatements()) != 0):
+    if (len(sample.sut.newBranches()) != 0) or (len(sample.sut.newStatements()) != 0):
         if config.verbose:
-            print "COLLECTING DUE TO NEW",len(sut.newBranches()),len(sut.newStatements())
-        fullPool.append((list(sut.test()), set(sut.currBranches()), set(sut.currStatements())))
+            print "COLLECTING DUE TO NEW",len(sample.sut.newBranches()),len(sample.sut.newStatements())
+        fullPool.append((list(sample.sut.test()), set(sample.sut.currBranches()), set(sample.sut.currStatements())))
 
 def main():
     global failCount,sut,config,reduceTime,quickCount,repeatCount,failures,cloudFailures,R,opTime,checkTime,guardTime,restartTime,nops,ntests
@@ -388,7 +388,7 @@ def main():
 
     sut = SUT.sut()
     if config.relax:
-        sut.relax()
+        sample.sut.relax()
 
     if config.readQuick:
         print "REPLAYING QUICK TESTS"
@@ -397,24 +397,24 @@ def main():
             fn = int(f.split("quicktest.")[1])
             if fn >= quickCount:
                 quickCount = fn + 1
-            t = sut.loadTest(f)
-            sut.replay(t,catchUncaught=True,checkProp=(not config.ignoreprops))
+            t = sample.sut.loadTest(f)
+            sample.sut.replay(t, catchUncaught=True, checkProp=(not config.ignoreprops))
         print "EXECUTION TIME:",time.time()-sqrtime
-        print "BRANCH COVERAGE:",len(sut.allBranches())
-        print "STATEMENT COVERAGE:",len(sut.allStatements())        
+        print "BRANCH COVERAGE:",len(sample.sut.allBranches())
+        print "STATEMENT COVERAGE:",len(sample.sut.allStatements())
                             
     if config.logging != None:
-        sut.setLog(config.logging)
+        sample.sut.setLog(config.logging)
 
     if config.profile:
         profileTime = {}
         profileCount = {}
-        for a in set(map(sut.actionClass, sut.actions())):
+        for a in set(map(sample.sut.actionClass, sample.sut.actions())):
             profileTime[a] = 0.0
             profileCount[a] = 0
         
     if config.markov != None:
-        nactions = len(sut.actions())
+        nactions = len(sample.sut.actions())
         mprobs = {}
         prefix = []
         probs = []
@@ -440,7 +440,7 @@ def main():
             else:
                 prefix.append(l[:-1])        
         
-    tacts = sut.actions()
+    tacts = sample.sut.actions()
     a = None
     sawNew = False
 
@@ -475,7 +475,7 @@ def main():
         quickAnalysisCounts = {}
         quickClassCounts = {}
         quickAnalysisRawCounts = {}
-        for c in set(map(sut.actionClass,sut.actions())):
+        for c in set(map(sample.sut.actionClass, sample.sut.actions())):
             quickAnalysisCounts[c] = 0
             quickClassCounts[c] = 0
             quickAnalysisRawCounts[c] = 0
@@ -493,11 +493,11 @@ def main():
         ntests += 1
 
         if config.swarm:
-            sut.standardSwarm(R,file=config.swarmProbs,P=config.swarmP)
+            sample.sut.standardSwarm(R, file=config.swarmProbs, P=config.swarmP)
             #print "CONFIG:",(sut.swarmConfig())
 
         if config.highLowSwarm != None:
-            classP = sut.highLowSwarm(R,file=config.swarmProbs,highProb=config.highLowSwarm)
+            classP = sample.sut.highLowSwarm(R, file=config.swarmProbs, highProb=config.highLowSwarm)
 
         if config.swarmSwitch != None:
             lastSwitch = 0
@@ -508,7 +508,7 @@ def main():
                 lastSwitch = switch
             
         startRestart = time.time()
-        sut.restart()
+        sample.sut.restart()
         restartTime += time.time() - startRestart
 
         if config.total:
@@ -528,15 +528,15 @@ def main():
 
             if (config.swarmSwitch != None) and (s in switches):
                 if config.highLowSwarm == None:
-                    sut.standardSwarm(R,file=config.swarmProbs,P=config.swarmP)
+                    sample.sut.standardSwarm(R, file=config.swarmProbs, P=config.swarmP)
                 else:
-                    classP = sut.highLowSwarm(R,file=config.swarmProbs,highProb=config.highLowSwarm)
+                    classP = sample.sut.highLowSwarm(R, file=config.swarmProbs, highProb=config.highLowSwarm)
 
             if (config.swarmLength != None) and (((s + 1) % config.swarmLength) == 0):
                 if config.highLowSwarm == None:
-                    sut.standardSwarm(R,file=config.swarmProbs,P=config.swarmP)
+                    sample.sut.standardSwarm(R, file=config.swarmProbs, P=config.swarmP)
                 else:
-                    classP = sut.highLowSwarm(R,file=config.swarmProbs,highProb=config.highLowSwarm)                
+                    classP = sample.sut.highLowSwarm(R, file=config.swarmProbs, highProb=config.highLowSwarm)
                 
             startGuard = time.time()
             tryStutter = (a != None) and (a[1]()) and ((config.stutter != None) or config.greedyStutter)
@@ -550,15 +550,15 @@ def main():
             else:
                 if config.markov == None:
                     if config.highLowSwarm == None:
-                        a = sut.randomEnabled(R)
+                        a = sample.sut.randomEnabled(R)
                     else:
-                        a = sut.randomEnabledClassProbs(R,classP)
+                        a = sample.sut.randomEnabledClassProbs(R, classP)
                 else:
-                    prefix = tuple(map(sut.actionClass,sut.test()[-markovN:]))
+                    prefix = tuple(map(sample.sut.actionClass, sample.sut.test()[-markovN:]))
                     if prefix not in mprobs:
-                        a = sut.randomEnabled(R)
+                        a = sample.sut.randomEnabled(R)
                     else:
-                        a = sut.randomEnabledClassProbs(R,mprobs[prefix])
+                        a = sample.sut.randomEnabledClassProbs(R, mprobs[prefix])
                         
             if a == None:
                 print "WARNING: DEADLOCK (NO ENABLED ACTIONS)"
@@ -566,7 +566,7 @@ def main():
             guardTime += time.time()-startGuard
             elapsed = time.time() - start
             if elapsed > config.timeout:
-                print "STOPPING TEST DUE TO TIMEOUT, TERMINATED AT LENGTH",len(sut.test())
+                print "STOPPING TEST DUE TO TIMEOUT, TERMINATED AT LENGTH",len(sample.sut.test())
                 break
             if a == None:
                 print "TERMINATING TEST DUE TO NO ENABLED ACTIONS"
@@ -582,77 +582,77 @@ def main():
                 fulltest.flush()            
 
             if config.verbose:
-                print "ACTION:",sut.prettyName(a[0])
+                print "ACTION:", sample.sut.prettyName(a[0])
                 
             startOp = time.time()
             if config.quickAnalysis:
-                quickClassCounts[sut.actionClass(a)] += 1
-            stepOk = sut.safely(a)
+                quickClassCounts[sample.sut.actionClass(a)] += 1
+            stepOk = sample.sut.safely(a)
             thisOpTime = time.time()-startOp
             nops += 1
             if config.profile:
-                profileTime[sut.actionClass(a)] += thisOpTime
-                profileCount[sut.actionClass(a)] += 1
+                profileTime[sample.sut.actionClass(a)] += thisOpTime
+                profileCount[sample.sut.actionClass(a)] += 1
             opTime += thisOpTime
-            if sut.warning() != None:
-                print "SUT WARNING:",sut.warning()            
+            if sample.sut.warning() != None:
+                print "SUT WARNING:", sample.sut.warning()
             if tryStutter:
                 print "DONE STUTTERING"
             if (stepOk or config.uncaught) and config.ignoreprops and (config.exploit != None):
                 collectExploitable()                
             if (not config.uncaught) and (not stepOk):
                 testFailed = True
-                handle_failure(sut.test(), "UNCAUGHT EXCEPTION", False)
+                handle_failure(sample.sut.test(), "UNCAUGHT EXCEPTION", False)
                 if not config.multiple:
                     print "STOPPING TESTING DUE TO FAILED TEST"
                 break
             
             startCheck = time.time()
             if not config.ignoreprops:
-                checkResult = sut.check()
+                checkResult = sample.sut.check()
                 checkTime += time.time()-startCheck
                 if checkResult and (stepOk or config.uncaught) and (config.exploit != None):
                     collectExploitable()
                     
             if not checkResult:
                 testFailed = True
-                handle_failure(sut.test(), "PROPERLY VIOLATION", True)
+                handle_failure(sample.sut.test(), "PROPERLY VIOLATION", True)
                 if not config.multiple:
                     print "STOPPING TESTING DUE TO FAILED TEST"
                 break
             
             elapsed = time.time() - start
             if config.running:
-                if sut.newBranches() != set([]):
-                    print "ACTION:",sut.prettyName(a[0])
-                    for b in sut.newBranches():
-                        print elapsed,len(sut.allBranches()),"New branch",b
+                if sample.sut.newBranches() != set([]):
+                    print "ACTION:", sample.sut.prettyName(a[0])
+                    for b in sample.sut.newBranches():
+                        print elapsed,len(sample.sut.allBranches()), "New branch",b
                         sys.stdout.flush()
                     sawNew = True
                 else:
                     sawNew = False
-                if sut.newStatements() != set([]):
-                    print "ACTION:",sut.prettyName(a[0])
-                    for s in sut.newStatements():
-                        print elapsed,len(sut.allStatements()),"New statement",s
+                if sample.sut.newStatements() != set([]):
+                    print "ACTION:", sample.sut.prettyName(a[0])
+                    for s in sample.sut.newStatements():
+                        print elapsed,len(sample.sut.allStatements()), "New statement",s
                         sys.stdout.flush()
                     sawNew = True
                 else:
                     sawNew = False                
 
             if config.uniqueValuesAnalysis:
-                uvals = sut.uniqueVals()
-                olds = sut.state()
-                currTest = list(sut.test())
+                uvals = sample.sut.uniqueVals()
+                olds = sample.sut.state()
+                currTest = list(sample.sut.test())
                 for u in uvals:
                     if u not in handledValues:
                         print "ANALYZING NEW UNIQUE VALUE:",u
                     else:
                         continue
-                    r = sut.reduce(currTest, sut.coversUnique(u), keepLast=False)
-                    rc = map(sut.actionClass, r)
-                    sut.replay(r)
-                    for ru in sut.uniqueVals():
+                    r = sample.sut.reduce(currTest, sample.sut.coversUnique(u), keepLast=False)
+                    rc = map(sample.sut.actionClass, r)
+                    sample.sut.replay(r)
+                    for ru in sample.sut.uniqueVals():
                         handledValues[ru] = True
                     if rc not in allUniquePaths:
                         print "NEW PATH DISCOVERED"
@@ -661,21 +661,21 @@ def main():
                             uniquef.write(s+"\n")
                         uniquef.write(("="*50)+"\n")
                         uniquef.flush()
-                sut.backtrack(olds)
+                sample.sut.backtrack(olds)
                 
 
                                         
             if elapsed > config.timeout:
-                print "STOPPING TEST DUE TO TIMEOUT, TERMINATED AT LENGTH",len(sut.test())
+                print "STOPPING TEST DUE TO TIMEOUT, TERMINATED AT LENGTH",len(sample.sut.test())
                 break
 
         if (config.exploit != None) and (not config.quickAnalysis):
-            for b in sut.currBranches():
+            for b in sample.sut.currBranches():
                 if b not in branchCoverageCount:
                     branchCoverageCount[b] = 1
                 else:
                     branchCoverageCount[b] += 1
-            for s in sut.currStatements():
+            for s in sample.sut.currStatements():
                 if s not in statementCoverageCount:
                     statementCoverageCount[s] = 1
                 else:
@@ -683,20 +683,20 @@ def main():
 
         if config.localize and not testFailed:
             testsPassed += 1
-            for s in sut.currStatements():
+            for s in sample.sut.currStatements():
                 if s not in localizeSPass:
                     localizeSPass[s] = 0
                 localizeSPass[s] += 1
-            for b in sut.currBranches():
+            for b in sample.sut.currBranches():
                 if b not in localizeBPass:
                     localizeBPass[b] = 0
                 localizeBPass[b] += 1                            
                     
         if config.quickAnalysis:
-            currTest = list(sut.test())
-            sut.replay(currTest)
-            currB = sut.currBranches()
-            currS = sut.currStatements()
+            currTest = list(sample.sut.test())
+            sample.sut.replay(currTest)
+            currB = sample.sut.currBranches()
+            currS = sample.sut.currStatements()
             clen = len(currTest)
             #print "GATHERING QUICK ANALYSIS DATA FOR",len(currB),"BRANCHES"
             for b in currB:
@@ -707,36 +707,36 @@ def main():
                     branchCoverageCount[b] = 0
                     quickAnalysisReducedB[b] = 0                    
                 branchCoverageCount[b] += 1
-                r = sut.reduce(currTest,sut.coversBranches([b]),keepLast=False)
+                r = sample.sut.reduce(currTest, sample.sut.coversBranches([b]), keepLast=False)
                 print "REDUCED FROM",clen,"TO",len(r)
                 sys.stdout.flush()
-                sut.replay(r)
-                for br in sut.currBranches():
+                sample.sut.replay(r)
+                for br in sample.sut.currBranches():
                     quickDoneB[br] = True
-                for sr in sut.currStatements():
+                for sr in sample.sut.currStatements():
                     quickDoneS[sr] = True                    
-                rc = map(sut.actionClass,r)
+                rc = map(sample.sut.actionClass, r)
                 if rc not in quickCorpus:
                     quickCorpus.append(rc)
                     for s in rc:
                         quickcf.write(s+"\n")
                     quickcf.write(("="*50)+"\n")
                     quickcf.flush()
-                sut.replay(r)
-                for b2 in sut.currBranches():
+                sample.sut.replay(r)
+                for b2 in sample.sut.currBranches():
                     if b2 not in quickAnalysisReducedB:
                         quickAnalysisReducedB[b2] = 0
                     quickAnalysisReducedB[b2] += 1
-                for s2 in sut.currStatements():
+                for s2 in sample.sut.currStatements():
                     if s2 not in quickAnalysisReducedS:
                         quickAnalysisReducedS[s2] = 0
                     quickAnalysisReducedS[s2] += 1
                 if b not in quickAnalysisBCounts:
                     quickAnalysisBCounts[b] = {}
                 quickAnalysisTotal += 1
-                for c in map(sut.actionClass,r):
+                for c in map(sample.sut.actionClass, r):
                     quickAnalysisRawCounts[c] += 1
-                for c in set(map(sut.actionClass,r)):
+                for c in set(map(sample.sut.actionClass, r)):
                     quickAnalysisCounts[c] += 1
                     if c not in quickAnalysisBCounts[b]:
                         quickAnalysisBCounts[b][c] = 0
@@ -750,30 +750,30 @@ def main():
                     quickAnalysisReducedS[s] = 0
                 statementCoverageCount[s] += 1                
                 print "ANALYZING STATEMENT",s
-                r = sut.reduce(currTest,sut.coversStatements([s]),keepLast=False)
+                r = sample.sut.reduce(currTest, sample.sut.coversStatements([s]), keepLast=False)
                 print "REDUCED FROM",clen,"TO",len(r)
                 sys.stdout.flush()
-                sut.replay(r)
-                for br in sut.currBranches():
+                sample.sut.replay(r)
+                for br in sample.sut.currBranches():
                     quickDoneB[br] = True
-                for sr in sut.currStatements():
+                for sr in sample.sut.currStatements():
                     quickDoneS[sr] = True                                
-                rc = map(sut.actionClass,r)
+                rc = map(sample.sut.actionClass, r)
                 if rc not in quickCorpus:
                     quickCorpus.append(rc)                
-                sut.replay(r)
-                for b2 in sut.currBranches():
+                sample.sut.replay(r)
+                for b2 in sample.sut.currBranches():
                     if b2 not in quickAnalysisReducedB:
                         quickAnalysisReducedB[b2] = 0
                     quickAnalysisReducedB[b2] += 1
-                for s2 in sut.currStatements():
+                for s2 in sample.sut.currStatements():
                     quickAnalysisReducedS[s2] += 1                
                 if s not in quickAnalysisSCounts:
                     quickAnalysisSCounts[s] = {}
                 quickAnalysisTotal += 1
-                for c in map(sut.actionClass,r):
+                for c in map(sample.sut.actionClass, r):
                     quickAnalysisRawCounts[c] += 1                
-                for c in set(map(sut.actionClass,r)):
+                for c in set(map(sample.sut.actionClass, r)):
                     quickAnalysisCounts[c] += 1
                     if c not in quickAnalysisSCounts[s]:
                         quickAnalysisSCounts[s][c] = 0
@@ -784,8 +784,8 @@ def main():
         if config.replayable:
             currtest.close()
         if config.quickTests:
-            if (sut.newCurrBranches() != set([])) or (sut.newCurrStatements() != set([])):
-                handle_failure(sut.test(), "NEW COVERAGE", False, newCov=True)
+            if (sample.sut.newCurrBranches() != set([])) or (sample.sut.newCurrStatements() != set([])):
+                handle_failure(sample.sut.test(), "NEW COVERAGE", False, newCov=True)
         if (not config.multiple) and (failCount > 0):
             break
         if elapsed > config.timeout:
@@ -796,14 +796,14 @@ def main():
         fulltest.close()
         
     if not config.nocover:
-        sut.restart()
-        print sut.report(config.coverfile),"PERCENT COVERED"
+        sample.sut.restart()
+        print sample.sut.report(config.coverfile), "PERCENT COVERED"
 
         if config.internal:
-            sut.internalReport()
+            sample.sut.internalReport()
         
         if config.html:
-            sut.htmlReport(config.html)
+            sample.sut.htmlReport(config.html)
 
     if config.uniqueValuesAnalysis:
         uniquef.close()
@@ -889,7 +889,7 @@ def main():
         n = 0
         for (test, err) in failures:
             print "FAILURE",n
-            sut.prettyPrintTest(test)
+            sample.sut.prettyPrintTest(test)
             n += 1
             if err != None:
                 print "ERROR:", err
@@ -928,7 +928,7 @@ def main():
     if config.localize and failCount > 0:
         scoresS = {}
         scoresB = {}
-        for s in sut.allStatements():
+        for s in sample.sut.allStatements():
             if s not in localizeSPass:
                 localizeSPass[s] = 0
             if s not in localizeSFail:
@@ -937,7 +937,7 @@ def main():
             if denom == 0.0:
                 continue
             scoresS[s] = localizeSFail[s]/denom
-        for b in sut.allBranches():
+        for b in sample.sut.allBranches():
             if b not in localizeBPass:
                 localizeBPass[b] = 0
             if b not in localizeBFail:
@@ -957,8 +957,8 @@ def main():
                 print b, scoresB[b]            
             
     if not config.nocover:
-        print len(sut.allBranches()),"BRANCHES COVERED"
-        print len(sut.allStatements()),"STATEMENTS COVERED"
+        print len(sample.sut.allBranches()), "BRANCHES COVERED"
+        print len(sample.sut.allStatements()), "STATEMENTS COVERED"
 
 if __name__ == '__main__':
     main()

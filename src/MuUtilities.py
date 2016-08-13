@@ -15,17 +15,16 @@ from difflib import *
 class MuUtilities(object):
 
     @classmethod
-    def load_module(cls, module_fullname, module_path):
+    def load_module(cls, module_fullname, module_path=None):
         """
         Load a single module by full module name
         """
         module = None
-        # if module_path[-3:] == ".py":
-        #     module_path = module_path.replace(".py", ".pyc")
         try:
-            # if os.path.exists(module_path[:len(module_path)-3] + '.pyc'):
-            #     os.remove(module_path[:len(module_path)-3] + '.pyc')
-            # module = imp.load_source(module_fullname, module_path)
+            if module_path is not None:
+                if os.path.exists(module_path[:len(module_path)-3] + '.pyc'):
+                    os.remove(module_path[:len(module_path)-3] + '.pyc')
+                module = imp.load_source(module_fullname, module_path)
             module = importlib.import_module(module_fullname)
         except ImportError:
             print "ImportError: faild to import " + module_fullname

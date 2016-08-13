@@ -43,7 +43,8 @@ def make_config(pargs, parser):
 
 def generator_factory(generator):
     if generator == "randomtester":
-        return None
+        randomtester = MuUtilities.load_module("generator.randomtester")
+        return randomtester
     elif generator == "randombeam":
         return None
     elif generator == "bfsmodelchecker":
@@ -94,7 +95,7 @@ if __name__ == "__main__":
 
         # generate mutants from target module
         print "Generating mutants from target module ...... "
-        mutants = MutantGenerator().mutate(module=module_under_test, operators=mutation_operators)
+        # mutants = MutantGenerator().mutate(module=module_under_test, operators=mutation_operators)
         print "Done.\n"
 
         if config.generator:

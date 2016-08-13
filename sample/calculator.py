@@ -37,13 +37,20 @@ class Calculator(object):
             print "divided by zero"
         except:
             print "unknown exception"
+        finally:
+            print 0
 
     @classmethod
     def floorDivAssign(cls, x, y):
-        if y == 0:
-            return None
-        x //= y
-        return x
+        try:
+            if y == 0:
+                return None
+            x //= y
+            return x
+        except ZeroDivisionError:
+            print "divided by zero"
+        except:
+            print "unknown exception"
 
     @classmethod
     def sum_all(cls, nums):
@@ -57,6 +64,7 @@ class Calculator(object):
             if flag:  # test COI
                 continue
             res += nums[i]
+        assert res >= 0
         return res
 
     @classmethod
@@ -75,7 +83,7 @@ class Calculator(object):
 
     @classmethod
     def divide_positiveInt(cls, x, y):
-        if x>0 and y>0:
+        if x >= y > 0:
             quotient = x / y
             return quotient
         else:
