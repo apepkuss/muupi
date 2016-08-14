@@ -4,22 +4,22 @@ import copy
 import sys
 from MuUtilities import *
 
-
 ##### for test ########
 from MuUtilities import *
 import codegen
+
+
 #######################
 
 
 class MutationOperator(object):
-
     @classmethod
     def type(cls):
         return cls.__class__
 
     @classmethod
     def build(cls, names=None):
-        if names is None or len(names)==0:
+        if names is None or len(names) == 0:
             names = ['AOD', 'AOR', 'ASR', 'BCR', 'LOD', 'LOI', 'CRP', \
                      'EXS', 'LCR', 'BOD', 'BOR', 'FHD', 'OIL', 'RIL', \
                      'COR', 'SSIR', 'SEIR', 'STIR', 'SVD', 'ZIL']
@@ -147,7 +147,6 @@ class MutationOperator(object):
             if name == 'FHD':
                 cls.mutation_operators.append((ast.TryFinally, FinallyHandlerDeletion))
 
-
             if name == 'OIL':
                 # if ast.For not in cls.mutation_operators:
                 #     cls.mutation_operators[ast.For] = [OneIterationLoop]
@@ -228,7 +227,6 @@ class MutationOperator(object):
 
 
 class ArithmeticOperatorDeletion(MutationOperator):
-
     @classmethod
     def name(cls):
         return 'AOD'
@@ -247,7 +245,6 @@ class ArithmeticOperatorDeletion(MutationOperator):
 
 
 class ArithmeticOperatorReplacement(MutationOperator):
-
     @classmethod
     def name(cls):
         return 'AOR'
@@ -263,14 +260,19 @@ class ArithmeticOperatorReplacement(MutationOperator):
         if node.__class__ is ast.BinOp:
             # mutate arithmetic +, -, *, /, %, pow(), >>, <<, |, &, ^
             if node.op.__class__ is ast.Add:
-                config.mutated = True
-                node.op = ast.Sub()
+                # filter out the "+" being used to concatenate strings
+                if (node.left.__class__ is not ast.Str and node.right.__class__ is not ast.Str) and \
+                        not (node.left.__class__ is ast.Call and node.left.func.id == 'str') and \
+                        not (node.right.__class__ is ast.Call and node.right.func.id == 'str'):
+                    config.mutated = True
+                    node.op = ast.Sub()
             elif node.op.__class__ is ast.Sub:
                 config.mutated = True
                 node.op = ast.Add()
             elif node.op.__class__ is ast.Mult:
-                config.mutated = True
-                node.op = ast.Div()
+                if not(node.left.__class__ is ast.Str or node.right.__class__ is ast.Str):
+                    config.mutated = True
+                    node.op = ast.Div()
             elif node.op.__class__ is ast.Div:
                 config.mutated = True
                 node.op = ast.Mult()
@@ -299,7 +301,7 @@ class ArithmeticOperatorReplacement(MutationOperator):
                 # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
                 pass
 
-            # todo: try more binary operations
+                # todo: try more binary operations
 
         elif node.__class__ is ast.UnaryOp:
             if node.op.__class__ is ast.UAdd:
@@ -309,13 +311,12 @@ class ArithmeticOperatorReplacement(MutationOperator):
                 config.mutated = True
                 node.op = ast.UAdd()
 
-            # todo: try more unary operations
+                # todo: try more unary operations
 
         return node
 
 
 class AssignmentOperatorReplacement(MutationOperator):
-
     @classmethod
     def name(cls):
         return "ASR"
@@ -332,8 +333,10 @@ class AssignmentOperatorReplacement(MutationOperator):
         """
         if node.__class__ is ast.AugAssign:
             if node.op.__class__ is ast.Add:
-                config.mutated = True
-                node.op = ast.Sub()
+                if (node.value.__class__ is not ast.Str) and \
+                        not (node.value.__class__ is ast.Call and node.value.func.id == 'str'):
+                    config.mutated = True
+                    node.op = ast.Sub()
             elif node.op.__class__ is ast.Sub:
                 config.mutated = True
                 node.op = ast.Add()
@@ -350,7 +353,6 @@ class AssignmentOperatorReplacement(MutationOperator):
 
 
 class BreakContinueReplacement(MutationOperator):
-
     @classmethod
     def name(cls):
         return "BCR"
@@ -394,7 +396,6 @@ class LogicalOperatorInsertion(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-
         if node.__class__ is ast.If \
                 or node.__class__ is ast.While \
                 or node.__class__ is ast.IfExp \
@@ -615,7 +616,8 @@ class ReverseIterationLoop(MutationOperator):
     def mutate(cls, node):
         if node.__class__ is ast.For and node.iter is not None:
             config.mutated = True
-            mutated_node = ast.Call(func=ast.Name(id='reversed', ctx=ast.Load()), args=[node.iter], keywords=[], starargs=None, kwargs=None)
+            mutated_node = ast.Call(func=ast.Name(id='reversed', ctx=ast.Load()), args=[node.iter], keywords=[],
+                                    starargs=None, kwargs=None)
             node.iter = mutated_node
         return node
 
@@ -741,4 +743,3 @@ class SuperCallingInsertion(MutationOperator):
     @classmethod
     def mutate(cls, node):
         pass
-

@@ -10,7 +10,7 @@ class Node:
     def __init__(self, key):
         self.key = key
         self.left = None 
-        self.right = None 
+        self.right = None
 
     def __eq__(self, node2):
         if node2 == None:

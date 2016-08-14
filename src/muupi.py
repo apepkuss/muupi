@@ -85,7 +85,7 @@ if __name__ == "__main__":
 
         print "Loading mutation operators ...... "
         # build mutation operators
-        operators = None #['ZIL']
+        operators = ['AOR']
         mutation_operators = MutationOperator.build(operators)
         assert len(mutation_operators) > 0
         print "Done.\n"
@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
         # generate mutants from target module
         print "Generating mutants from target module ...... "
-        # mutants = MutantGenerator().mutate(module=module_under_test, operators=mutation_operators)
+        mutants = MutantGenerator().mutate(module=module_under_test, operators=mutation_operators)
         print "Done.\n"
 
         if config.generator:
