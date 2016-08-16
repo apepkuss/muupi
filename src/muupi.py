@@ -15,8 +15,8 @@ def parse_args():
                         help='Full name of module under test.')
     parser.add_argument('-p', '--module-path', type=str, default=None,
                         help='The path of source code of module under test.')
-    parser.add_argument('-t', '--tsmodule-fullname', type=str, default=None,
-                        help='Full name of test suite module.')
+    # parser.add_argument('-t', '--tsmodule-fullname', type=str, default=None,
+    #                     help='Full name of test suite module.')
     # parser.add_argument('-P', '--tsmodule-path', type=str, default=None,
     #                     help='The path of source code of test suite module.')
     parser.add_argument('-g', '--generator', type=str, default=None,
@@ -25,6 +25,11 @@ def parse_args():
                         help='Specify the path of a generator.')
     parser.add_argument('-l', '--list-generators', action='store_true',
                         help='List all available generators.')
+
+    parser.add_argument('-o', '--mutation-operators', type=str, default=None,
+                        help='Specify mutation operators to use.')
+    parser.add_argument('--list-mutation-operators', action='store_true',
+                        help='List all available mutation operators.')
 
     parsed_args = parser.parse_args(sys.argv[1:])
     return parsed_args, parser
@@ -69,8 +74,15 @@ if __name__ == "__main__":
     if config.list_generators:
         print "TODO: list all available generators."
 
+    elif config.list_mutation_operators:
+        print "Mutation Operators (shortname, fullname): "
+        items = MutationOperator.list_all_operators()
+        for i in xrange(1, len(items)+1):
+            print str(i) + '. ' + items[i-1][0] + ': ' + items[i-1][1]
+        print
+
     # load module to mutate
-    if config.module_fullname:
+    elif config.module_fullname:
         print "Loading target module ...... "
         # todo: DO NOT REMOVE THE FOLLOWING TWO LINES
         # module_under_test_fullname = "sample.calculator"
@@ -89,7 +101,10 @@ if __name__ == "__main__":
         # ['AOD', 'AOR', 'ASR', 'BCR', 'LOD', 'LOI', 'CRP', 'EXS', 'LCR', 'BOD', 'BOR',
         # 'FHD', 'OIL', 'RIL', 'COR', 'SSIR', 'SEIR', 'STIR', 'SVD', 'ZIL']
         # The concrete definition of each mutation operator can be found in MuOperators.py
-        operators = ['AOR']
+        if config.mutation_operators:
+            operators = config.mutation_operators.split('+')
+        else:
+            operators = None
         mutation_operators = MutationOperator.build(operators)
         assert len(mutation_operators) > 0
         print "Done.\n"

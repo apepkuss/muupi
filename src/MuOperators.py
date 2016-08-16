@@ -225,6 +225,36 @@ class MutationOperator(object):
 
         return cls.mutation_operators
 
+    @classmethod
+    def list_all_operators(cls):
+        res = []
+
+        res.append((ArithmeticOperatorDeletion.name(), ArithmeticOperatorDeletion.__name__))
+        res.append((ArithmeticOperatorReplacement.name(), ArithmeticOperatorReplacement.__name__))
+        res.append((AssignmentOperatorReplacement.name(), AssignmentOperatorReplacement.__name__))
+        res.append((BreakContinueReplacement.name(), BreakContinueReplacement.__name__))
+        res.append((LogicalOperatorDeletion.name(), LogicalOperatorDeletion.__name__))
+
+        res.append((LogicalOperatorInsertion.name(), LogicalOperatorInsertion.__name__))
+        res.append((LogicalConnectorReplacement.name(), LogicalConnectorReplacement.__name__))
+        res.append((BitwiseOperatorDeletion.name(), BitwiseOperatorDeletion.__name__))
+        res.append((BitwiseOperatorReplacement.name(), BitwiseOperatorReplacement.__name__))
+        res.append((ConstantReplacement.name(), ConstantReplacement.__name__))
+
+        res.append((FinallyHandlerDeletion.name(), FinallyHandlerDeletion.__name__))
+        res.append((ExceptionSwallowing.name(), ExceptionSwallowing.__name__))
+        res.append((ComparisonOperatorReplacement.name(), ComparisonOperatorReplacement.__name__))
+        res.append((SliceStartIndexDeletion.name(), SliceStartIndexDeletion.__name__))
+        res.append((SliceEndIndexDeletion.name(), SliceEndIndexDeletion.__name__))
+
+        res.append((SliceStepIndexDeletion.name(), SliceStepIndexDeletion.__name__))
+        res.append((OneIterationLoop.name(), OneIterationLoop.__name__))
+        res.append((ReverseIterationLoop.name(), ReverseIterationLoop.__name__))
+        res.append((SelfVariableDeletion.name(), SelfVariableDeletion.__name__))
+        res.append((ZeroIterationLoop.name(), ZeroIterationLoop.__name__))
+
+        return res
+
 
 class ArithmeticOperatorDeletion(MutationOperator):
     @classmethod
