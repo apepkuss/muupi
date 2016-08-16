@@ -469,10 +469,9 @@ class ConstantReplacement(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        # if node.__class__ is ast.Assign:
         if node.__class__ is ast.Num:
             config.mutated = True
-            node.n = sys.maxint
+            node.n += 1
         elif node.__class__ is ast.Str:
             config.mutated = True
             node.n = ''

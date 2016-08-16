@@ -11,7 +11,6 @@ from MuTester import *
 from copy import deepcopy
 from difflib import *
 
-
 class MuUtilities(object):
 
     @classmethod
@@ -26,10 +25,24 @@ class MuUtilities(object):
                     os.remove(module_path[:len(module_path)-3] + '.pyc')
                 module = imp.load_source(module_fullname, module_path)
             module = importlib.import_module(module_fullname)
+
+            # tester = importlib.import_module('generator.randomtester')
+            # assert 'generator.randomtester' in sys.modules
+            # assert 'sample.sut' in sys.modules
+            # assert 'sample.avl' in sys.modules
+            # new_avl_module = imp.load_source()
+            # sys.modules['sample.avl']
+            # assert 'sample.avl' not in sys.modules
+
+            # file, pathname, description = imp.find_module('sample')
+            # print sys.modules
+            # module = imp.load_module(module_fullname, file, pathname, description)
+
+            print module
         except ImportError:
             print "ImportError: faild to import " + module_fullname
             traceback.print_exc(file=sys.stdout)
-        assert module is not None
+        # assert module is not None
         return module
 
     @classmethod
@@ -60,24 +73,22 @@ class MuUtilities(object):
             os.mkdir(os.path.curdir + '/output')
         dest_dir = os.path.curdir + '/output'
 
-        timestamp = int(round(time.time() * 1000))
-
         # write the original code to a file
         original_code = codegen.to_source(node1)
-        filename = operator_name + "_original_" + str(timestamp) + ".py"
+        filename = operator_name + "_original_" + ".py"
         path = os.path.join(dest_dir, filename)
         cls.write_to_file(path, original_code)
 
         # write the mutated code to a file
         mutated_code = codegen.to_source(node2)
-        filename = operator_name + "_mutant_" + str(timestamp) + ".py"
+        filename = operator_name + "_mutant_" + ".py"
         path = os.path.join(dest_dir, filename)
         cls.write_to_file(path, mutated_code)
 
         # write the diff result to a file
         d = Differ()
         res = ''.join(list(d.compare(original_code, mutated_code)))
-        filename = operator_name + "_diff_" + str(timestamp) + ".py"
+        filename = operator_name + "_diff_" + ".py"
         path = os.path.join(dest_dir, filename)
         cls.write_to_file(path, res)
 

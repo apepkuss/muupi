@@ -62,11 +62,11 @@ class MutantGenerator(ast.NodeTransformer):
 
             # generate a mutant module from mutated ast tree
             if config.mutated:
-                mutated_module = self.generate_mutant_module(self.mutated_ast)
+                mutated_module = self.generate_mutant_module(self.mutated_ast, operator[1].name()+'_'+operator[0].__name__)
                 mutated_modules.append(mutated_module)
 
                 # todo: diff two ast
-                MuUtilities.make_diff(self.original_ast, self.mutated_ast, operator[1].name())
+                MuUtilities.make_diff(self.original_ast, self.mutated_ast, operator[1].name()+'_'+operator[0].__name__)
 
         return mutated_modules
 
