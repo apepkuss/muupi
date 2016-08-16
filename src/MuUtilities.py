@@ -20,29 +20,26 @@ class MuUtilities(object):
         """
         module = None
         try:
-            if module_path is not None:
-                if os.path.exists(module_path[:len(module_path)-3] + '.pyc'):
-                    os.remove(module_path[:len(module_path)-3] + '.pyc')
-                module = imp.load_source(module_fullname, module_path)
-            module = importlib.import_module(module_fullname)
+            names = module_fullname.split('.')
+            pkg_path = module_path
+            for i in xrange(len(names)):
+                if names[i] not in sys.modules:
+                    if i == 0:
+                        f, filename, data = imp.find_module(names[i], [pkg_path])
+                    else:
+                        f, filename, data = imp.find_module(names[i], pkg_path)
+                    if i == len(names)-1:
+                        name, ext = os.path.splitext(filename)
+                        if os.path.exists(name + '.pyc'):
+                            os.remove(name + '.pyc')
 
-            # tester = importlib.import_module('generator.randomtester')
-            # assert 'generator.randomtester' in sys.modules
-            # assert 'sample.sut' in sys.modules
-            # assert 'sample.avl' in sys.modules
-            # new_avl_module = imp.load_source()
-            # sys.modules['sample.avl']
-            # assert 'sample.avl' not in sys.modules
-
-            # file, pathname, description = imp.find_module('sample')
-            # print sys.modules
-            # module = imp.load_module(module_fullname, file, pathname, description)
-
-            print module
+                    module = imp.load_module(names[i], f, filename, data)
+                    if i < len(names)-1:
+                        pkg_path = module.__path__
         except ImportError:
             print "ImportError: faild to import " + module_fullname
             traceback.print_exc(file=sys.stdout)
-        # assert module is not None
+        assert module is not None
         return module
 
     @classmethod

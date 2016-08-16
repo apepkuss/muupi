@@ -17,10 +17,12 @@ def parse_args():
                         help='The path of source code of module under test.')
     parser.add_argument('-t', '--tsmodule-fullname', type=str, default=None,
                         help='Full name of test suite module.')
-    parser.add_argument('-P', '--tsmodule-path', type=str, default=None,
-                        help='The path of source code of test suite module.')
+    # parser.add_argument('-P', '--tsmodule-path', type=str, default=None,
+    #                     help='The path of source code of test suite module.')
     parser.add_argument('-g', '--generator', type=str, default=None,
                         help='Specify a generator.')
+    parser.add_argument('-P', '--generator-path', type=str, default=None,
+                        help='Specify the path of a generator.')
     parser.add_argument('-l', '--list-generators', action='store_true',
                         help='List all available generators.')
 
@@ -41,9 +43,9 @@ def make_config(pargs, parser):
     return nt_config
 
 
-def generator_factory(generator):
+def generator_factory(generator, path=None):
     if generator == "randomtester":
-        randomtester = MuUtilities.load_module("generator.randomtester")
+        randomtester = MuUtilities.load_module("generator.randomtester", path)
         return randomtester
     elif generator == "randombeam":
         return None
@@ -78,6 +80,7 @@ if __name__ == "__main__":
         module_under_test_path = config.module_path
 
         module_under_test = MuUtilities.load_module(module_under_test_fullname, module_under_test_path)
+        assert module_under_test is not None
         print "Done.\n"
 
         print "Loading mutation operators ...... "
@@ -86,7 +89,7 @@ if __name__ == "__main__":
         # ['AOD', 'AOR', 'ASR', 'BCR', 'LOD', 'LOI', 'CRP', 'EXS', 'LCR', 'BOD', 'BOR',
         # 'FHD', 'OIL', 'RIL', 'COR', 'SSIR', 'SEIR', 'STIR', 'SVD', 'ZIL']
         # The concrete definition of each mutation operator can be found in MuOperators.py
-        operators = None # ['AOR']
+        operators = ['AOR']
         mutation_operators = MutationOperator.build(operators)
         assert len(mutation_operators) > 0
         print "Done.\n"
@@ -161,7 +164,7 @@ if __name__ == "__main__":
             # load tstl tester
             else:
                 # todo: load a specified generator, e.g. randomtester, randombeam, bfsmodelchecker, and etc.
-                tester_module = generator_factory(config.generator)
+                tester_module = generator_factory(config.generator, config.generator_path)
 
                 if hasattr(tester_module, 'SUT'):
                     suite_module = getattr(tester_module, 'SUT')
