@@ -16,4 +16,4 @@ Here is a concrete sample for _avl.py_, which is located in the _sample_ directo
 
 _-m_ option indicates the target module to mutate, and the fullname of the target module should be given.
 _-p_ option is used to show the directory, in which the package _sample_ should be there.
-_-o_ tells muupi the mutation operator information. At present, muupi supports 20 mutation operators. The command _python muupi.py --list-mutation-operators_ can show you all these mutation operators.
+_-o_ tells muupi the mutation operator information. At present, muupi supports 20 mutation operators. The command `_python muupi.py --list-mutation-operators` can show you all these mutation operators.
