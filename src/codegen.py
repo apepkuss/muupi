@@ -67,7 +67,7 @@ def to_source(node, indent_with=' ' * 4, add_line_information=False):
     generator = SourceGenerator(indent_with, add_line_information)
     generator.visit(node)
 
-    return ''.join(generator.result)
+    return ''.join(str(v) for v in generator.result)
 
 class SourceGenerator(NodeVisitor):
     """This visitor is able to transform a well formed syntax tree into python
