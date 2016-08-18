@@ -21,8 +21,8 @@ class MutationOperator(object):
     def build(cls, names=None):
         if names is None or len(names) == 0:
             names = ['AOD', 'AOR', 'ASR', 'BCR', 'LOD', 'LOI', 'CRP', \
-                     'EXS', 'LCR', 'BOD', 'BOR', 'FHD', 'OIL', 'RIL', \
-                     'COR', 'SSIR', 'SEIR', 'STIR', 'SVD', 'ZIL']
+                     'EXS', 'LCR', 'BOD', 'BOR', 'FHD', 'FCD', 'OIL', 'RIL', \
+                     'COR', 'SSIR', 'SEIR', 'STIR', 'SVD', 'SMD', 'ZIL']
 
         cls.mutation_operators = []
 
@@ -35,18 +35,8 @@ class MutationOperator(object):
                 cls.mutation_operators.append((ast.UnaryOp, ArithmeticOperatorDeletion))
 
             if name == 'AOR':
-                # if ast.UnaryOp not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.UnaryOp] = [ArithmeticOperatorReplacement]
-                # elif ArithmeticOperatorReplacement not in cls.mutation_operators[ast.UnaryOp]:
-                #     cls.mutation_operators[ast.UnaryOp].append(ArithmeticOperatorReplacement)
-                #
-                # if ast.BinOp not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.BinOp] = [ArithmeticOperatorReplacement]
-                # elif ArithmeticOperatorReplacement not in cls.mutation_operators[ast.BinOp]:
-                #     cls.mutation_operators[ast.BinOp].append(ArithmeticOperatorReplacement)
-
-                cls.mutation_operators.append((ast.UnaryOp, ArithmeticOperatorReplacement))
                 cls.mutation_operators.append((ast.BinOp, ArithmeticOperatorReplacement))
+                cls.mutation_operators.append((ast.UnaryOp, ArithmeticOperatorReplacement))
 
             if name == 'ASR':
                 # if ast.AugAssign not in cls.mutation_operators:
@@ -223,6 +213,14 @@ class MutationOperator(object):
                 cls.mutation_operators.append((ast.For, ZeroIterationLoop))
                 cls.mutation_operators.append((ast.While, ZeroIterationLoop))
 
+            if name == 'SMD':
+                cls.mutation_operators.append((ast.Break, ZeroIterationLoop))
+                cls.mutation_operators.append((ast.Continue, ZeroIterationLoop))
+                cls.mutation_operators.append((ast.Raise, ZeroIterationLoop))
+
+            if name == 'FCD':
+                cls.mutation_operators.append((ast.Call, FunctionCallDeletion))
+
         return cls.mutation_operators
 
     @classmethod
@@ -252,6 +250,9 @@ class MutationOperator(object):
         res.append((ReverseIterationLoop.name(), ReverseIterationLoop.__name__))
         res.append((SelfVariableDeletion.name(), SelfVariableDeletion.__name__))
         res.append((ZeroIterationLoop.name(), ZeroIterationLoop.__name__))
+
+        res.append((StatementDeletion.name(), StatementDeletion.__name__))
+        res.append((FunctionCallDeletion.name(), FunctionCallDeletion.__name__))
 
         return res
 
@@ -290,12 +291,15 @@ class ArithmeticOperatorReplacement(MutationOperator):
         if node.__class__ is ast.BinOp:
             # mutate arithmetic +, -, *, /, %, pow(), >>, <<, |, &, ^
             if node.op.__class__ is ast.Add:
-                # filter out the "+" being used to concatenate strings
-                if (node.left.__class__ is not ast.Str and node.right.__class__ is not ast.Str) and \
-                        not (node.left.__class__ is ast.Call and node.left.func.id == 'str') and \
-                        not (node.right.__class__ is ast.Call and node.right.func.id == 'str'):
-                    config.mutated = True
-                    node.op = ast.Sub()
+                try:
+                    # filter out the "+" being used to concatenate strings
+                    if node.left.__class__ is ast.Num or node.right.__class__ is ast.Num: # and \
+                    #         not (node.left.__class__ is ast.Call and hasattr(node.left.func, 'id') and node.left.func.id == 'str') and \
+                    #         not (node.right.__class__ is ast.Call and hasattr(node.right.func, 'id') and node.right.func.id == 'str'):
+                        config.mutated = True
+                        node.op = ast.Sub()
+                except AttributeError:
+                    print 'checkpoint'
             elif node.op.__class__ is ast.Sub:
                 config.mutated = True
                 node.op = ast.Add()
@@ -382,6 +386,44 @@ class AssignmentOperatorReplacement(MutationOperator):
         return node
 
 
+class BitwiseOperatorDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "BOD"
+
+    @classmethod
+    def mutate(cls, node):
+        if node.__class__ is ast.UnaryOp and node.op.__class__ is ast.Invert:
+            config.mutated = True
+            return node.operand
+        return node
+
+
+class BitwiseOperatorReplacement(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "BOR"
+
+    @classmethod
+    def mutate(cls, node):
+        if node.__class__ is ast.BitAnd:
+            config.mutated = True
+            node = ast.BitOr()
+        elif node.__class__ is ast.BitOr:
+            config.mutated = True
+            node = ast.BitAnd()
+        elif node.__class__ is ast.BitXor:
+            config.mutated = True
+            node = ast.BitAnd()
+        elif node.__class__ is ast.LShift:
+            config.mutated = True
+            node = ast.RShift()
+        elif node.__class__ is ast.RShift:
+            config.mutated = True
+            node = ast.LShift()
+        return node
+
+
 class BreakContinueReplacement(MutationOperator):
     @classmethod
     def name(cls):
@@ -400,6 +442,22 @@ class BreakContinueReplacement(MutationOperator):
         elif node.__class__ is ast.Continue:
             config.mutated = True
             node = ast.Break()
+        return node
+
+
+class ConstantReplacement(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "CRP"
+
+    @classmethod
+    def mutate(cls, node):
+        if node.__class__ is ast.Num:
+            config.mutated = True
+            node.n += 1
+        elif node.__class__ is ast.Str:
+            config.mutated = True
+            node.n = ''
         return node
 
 
@@ -451,60 +509,6 @@ class LogicalConnectorReplacement(MutationOperator):
         elif node.__class__ is ast.Or:
             config.mutated = True
             node = ast.And()
-        return node
-
-
-class BitwiseOperatorDeletion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "BOD"
-
-    @classmethod
-    def mutate(cls, node):
-        if node.__class__ is ast.UnaryOp and node.op.__class__ is ast.Invert:
-            config.mutated = True
-            return node.operand
-        return node
-
-
-class BitwiseOperatorReplacement(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "BOR"
-
-    @classmethod
-    def mutate(cls, node):
-        if node.__class__ is ast.BitAnd:
-            config.mutated = True
-            node = ast.BitOr()
-        elif node.__class__ is ast.BitOr:
-            config.mutated = True
-            node = ast.BitAnd()
-        elif node.__class__ is ast.BitXor:
-            config.mutated = True
-            node = ast.BitAnd()
-        elif node.__class__ is ast.LShift:
-            config.mutated = True
-            node = ast.RShift()
-        elif node.__class__ is ast.RShift:
-            config.mutated = True
-            node = ast.LShift()
-        return node
-
-
-class ConstantReplacement(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "CRP"
-
-    @classmethod
-    def mutate(cls, node):
-        if node.__class__ is ast.Num:
-            config.mutated = True
-            node.n += 1
-        elif node.__class__ is ast.Str:
-            config.mutated = True
-            node.n = ''
         return node
 
 
@@ -676,6 +680,39 @@ class ZeroIterationLoop(MutationOperator):
         if node.__class__ is ast.For or node.__class__ is ast.While:
             config.mutated = True
             node.body = [ast.Break()] + node.body
+        return node
+
+
+class StatementDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "SMD"
+
+    @classmethod
+    def mutate(cls, node):
+        """
+        Replace raise, break, continue with pass.
+        """
+        if node.__class__ is ast.Raise or node.__class__ is ast.Continue or node.__class__ is ast.Break:
+            config.mutated = True
+            node = ast.Pass()
+        return node
+
+
+class FunctionCallDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "FCD"
+
+    @classmethod
+    def mutate(cls, node):
+        """
+        Replace raise, break, continue with pass.
+        """
+        if node.__class__ is ast.Call:
+            # config.mutated = True
+            # node = ast.Pass()
+            pass
         return node
 
 

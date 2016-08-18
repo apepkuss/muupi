@@ -63,7 +63,8 @@ class Calculator(object):
             flag = nums[i]==0
             if flag:  # test COI
                 continue
-            res += nums[i]
+            # res += nums[i]
+            res = cls.add(res, nums[i])  # FCD
         assert res >= 0
         return res
 

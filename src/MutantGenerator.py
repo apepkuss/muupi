@@ -30,7 +30,7 @@ class MutantGenerator(ast.NodeTransformer):
         with open(module.__file__) as module_file:
             try:
                 code = module_file.read()
-                original_ast = ast.parse(code, module_file.name)
+                original_ast = ast.parse(code, filename=module_file.name)
             except TypeError:
                 # remove the pyc file of sut if raise a TypeError exception
                 pass
@@ -97,7 +97,10 @@ class MutantGenerator(ast.NodeTransformer):
         mutant_module_shortname = prefix + module_shortname
         mutant_code = compile(mutated_ast, mutant_module_shortname, "exec")
         mutant_module = imp.new_module(mutant_module_shortname)
-        exec mutant_code in mutant_module.__dict__
+        try:
+            exec mutant_code in mutant_module.__dict__
+        except TypeError:
+            print 'checkpoint'
         return mutant_module
 
     def dfs_visit(self, node):
@@ -250,6 +253,11 @@ class MutantGenerator(ast.NodeTransformer):
         self.dfs_visit(node)
         return node
 
+    def visit_Raise(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
     def visit_Assign(self, node):
         node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
@@ -278,6 +286,12 @@ class MutantGenerator(ast.NodeTransformer):
     #     return node
 
     def visit_ExceptHandler(self, node):
+        node = self.mutate_single_node(node, self.operator)
+        if node:
+            self.dfs_visit(node)
+        return node
+
+    def visit_Call(self, node):
         node = self.mutate_single_node(node, self.operator)
         if node:
             self.dfs_visit(node)
