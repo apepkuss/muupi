@@ -179,7 +179,10 @@ class CalculatorTest(object):
 def method_name():
     print 'this is a method'
 
+method_name()
+
 if __name__ == "__main__":
     res = Calculator.floorDiv(5, 2)
+    Calculator.add(5, 5)
     print res
 

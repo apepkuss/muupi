@@ -5,12 +5,15 @@ import logging
 
 from MuUtilities import *
 from copy import deepcopy
+from MuOperators import StatementDeletion
+
 
 
 class MutantGenerator(ast.NodeTransformer):
-
     def __init__(self):
         self.nodes_to_mutate = {}
+        self.nodes_to_remove = set()
+        self.nodes_to_potential = set()
         self.original_ast = None
         self.mutated_ast = None
 
@@ -209,7 +212,29 @@ class MutantGenerator(ast.NodeTransformer):
         :param node:
         :return:
         """
-        node = self.mutate_single_node(node, self.operator)
+        if self.operator[1] is StatementDeletion:
+            for anode in node.body:
+                if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
+                    self.nodes_to_remove.add(anode)
+                elif anode.__class__ in [ast.Expr]:
+                    self.nodes_to_potential.add(anode)
+            node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
+        else:
+            node = self.mutate_single_node(node, self.operator)
+        self.dfs_visit(node)
+        return node
+
+    def visit_Expr(self, node):
+        if self.operator[1] is StatementDeletion:
+            if node in self.nodes_to_remove:
+                node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
+            elif node in self.nodes_to_potential:
+                if node.value.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
+                    self.nodes_to_potential.remove(node)
+                    self.nodes_to_remove.add(node)
+                    node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
+        else:
+            node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
@@ -234,12 +259,28 @@ class MutantGenerator(ast.NodeTransformer):
         return node
 
     def visit_For(self, node):
-        node = self.mutate_single_node(node, self.operator)
+        if self.operator[1] is StatementDeletion:
+            for anode in node.body:
+                if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
+                    self.nodes_to_remove.add(anode)
+                elif anode.__class__ in [ast.Expr]:
+                    self.nodes_to_potential.add(anode)
+            node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
+        else:
+            node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
     def visit_While(self, node):
-        node = self.mutate_single_node(node, self.operator)
+        if self.operator[1] is StatementDeletion:
+            for anode in node.body:
+                if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
+                    self.nodes_to_remove.add(anode)
+                elif anode.__class__ in [ast.Expr]:
+                    self.nodes_to_potential.add(anode)
+            node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
+        else:
+            node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
@@ -254,17 +295,29 @@ class MutantGenerator(ast.NodeTransformer):
         return node
 
     def visit_Raise(self, node):
-        node = self.mutate_single_node(node, self.operator)
+        if self.operator[1] is StatementDeletion:
+            if len(self.nodes_to_remove) > 0 and node in self.nodes_to_remove:
+                node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
+        else:
+            node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
     def visit_Assign(self, node):
-        node = self.mutate_single_node(node, self.operator)
+        if self.operator[1] is StatementDeletion:
+            if len(self.nodes_to_remove) > 0 and node in self.nodes_to_remove:
+                node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
+        else:
+            node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
     def visit_AugAssign(self, node):
-        node = self.mutate_single_node(node, self.operator)
+        if self.operator[1] is StatementDeletion:
+            if len(self.nodes_to_remove) > 0 and node in self.nodes_to_remove:
+                node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
+        else:
+            node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
@@ -292,13 +345,25 @@ class MutantGenerator(ast.NodeTransformer):
         return node
 
     def visit_Call(self, node):
-        node = self.mutate_single_node(node, self.operator)
+        if self.operator[1] is StatementDeletion:
+            if len(self.nodes_to_remove) > 0 and node in self.nodes_to_remove:
+                node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
+        else:
+            node = self.mutate_single_node(node, self.operator)
         if node:
             self.dfs_visit(node)
         return node
 
     def visit_FunctionDef(self, node):
-        node = self.mutate_single_node(node, self.operator)
+        if self.operator[1] is StatementDeletion:
+            for anode in node.body:
+                if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
+                    self.nodes_to_remove.add(anode)
+                elif anode.__class__ in [ast.Expr]:
+                    self.nodes_to_potential.add(anode)
+            node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
+        else:
+            node = self.mutate_single_node(node, self.operator)
         self.dfs_visit(node)
         return node
 
@@ -307,13 +372,29 @@ class MutantGenerator(ast.NodeTransformer):
         self.dfs_visit(node)
         return node
 
-    def mutate_single_node(self, node, operator):
+    # def mutate_single_node(self, node, operator):
+    #     """
+    #     Mutate a single node by a specified operator
+    #     """
+    #     if node.__class__ is operator[0]:
+    #         # mutate
+    #         mutated_node = operator[1].mutate(node)
+    #
+    #         if config.mutated:
+    #             node = mutated_node
+    #
+    #     return node
+
+    def mutate_single_node(self, node, operator, nodes_to_remove=None):
         """
         Mutate a single node by a specified operator
         """
         if node.__class__ is operator[0]:
             # mutate
-            mutated_node = operator[1].mutate(node)
+            if nodes_to_remove:
+                mutated_node = operator[1].mutate(node, nodes_to_remove)
+            else:
+                mutated_node = operator[1].mutate(node)
 
             if config.mutated:
                 node = mutated_node

@@ -214,12 +214,11 @@ class MutationOperator(object):
                 cls.mutation_operators.append((ast.While, ZeroIterationLoop))
 
             if name == 'SMD':
-                cls.mutation_operators.append((ast.Break, ZeroIterationLoop))
-                cls.mutation_operators.append((ast.Continue, ZeroIterationLoop))
-                cls.mutation_operators.append((ast.Raise, ZeroIterationLoop))
-
-            if name == 'FCD':
-                cls.mutation_operators.append((ast.Call, FunctionCallDeletion))
+                cls.mutation_operators.append((ast.Raise, StatementDeletion))
+                cls.mutation_operators.append((ast.Call, StatementDeletion))
+                cls.mutation_operators.append((ast.Expr, StatementDeletion))
+                cls.mutation_operators.append((ast.Assign, StatementDeletion))
+                cls.mutation_operators.append((ast.AugAssign, StatementDeletion))
 
         return cls.mutation_operators
 
@@ -252,7 +251,6 @@ class MutationOperator(object):
         res.append((ZeroIterationLoop.name(), ZeroIterationLoop.__name__))
 
         res.append((StatementDeletion.name(), StatementDeletion.__name__))
-        res.append((FunctionCallDeletion.name(), FunctionCallDeletion.__name__))
 
         return res
 
@@ -512,6 +510,23 @@ class LogicalConnectorReplacement(MutationOperator):
         return node
 
 
+class StatementDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "SMD"
+
+    @classmethod
+    def mutate(cls, node, nodes_to_remove):
+        """
+        Replace raise, break, continue with pass.
+        """
+        if node.__class__ in [ast.Raise, ast.Assign, ast.AugAssign, ast.Call, ast.Expr] and node in nodes_to_remove:
+            nodes_to_remove.remove(node)
+            node = ast.Pass()
+            config.mutated = True
+        return node
+
+
 # class ExceptionHandlerDeletion(MutationOperator):
 #     @classmethod
 #     def name(cls):
@@ -683,39 +698,6 @@ class ZeroIterationLoop(MutationOperator):
         return node
 
 
-class StatementDeletion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "SMD"
-
-    @classmethod
-    def mutate(cls, node):
-        """
-        Replace raise, break, continue with pass.
-        """
-        if node.__class__ is ast.Raise or node.__class__ is ast.Continue or node.__class__ is ast.Break:
-            config.mutated = True
-            node = ast.Pass()
-        return node
-
-
-class FunctionCallDeletion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "FCD"
-
-    @classmethod
-    def mutate(cls, node):
-        """
-        Replace raise, break, continue with pass.
-        """
-        if node.__class__ is ast.Call:
-            # config.mutated = True
-            # node = ast.Pass()
-            pass
-        return node
-
-
 ###################### todo: another 9 rules to be added ############################
 
 class ClassmethodDecoratorInsertion(MutationOperator):
@@ -775,16 +757,6 @@ class StaticmethodDecoratorInsertion(MutationOperator):
     @classmethod
     def name(cls):
         return "SDI"
-
-    @classmethod
-    def mutate(cls, node):
-        pass
-
-
-class StatementDeletion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "SDL"
 
     @classmethod
     def mutate(cls, node):
