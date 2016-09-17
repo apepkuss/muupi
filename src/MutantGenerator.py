@@ -8,12 +8,11 @@ from copy import deepcopy
 from MuOperators import StatementDeletion
 
 
-
 class MutantGenerator(ast.NodeTransformer):
     def __init__(self):
         self.nodes_to_mutate = {}
-        self.nodes_to_remove = set()
-        self.nodes_to_potential = set()
+        # self.nodes_to_remove = set()
+        # self.nodes_to_potential = set()
         self.original_ast = None
         self.mutated_ast = None
 
@@ -52,42 +51,63 @@ class MutantGenerator(ast.NodeTransformer):
         self.original_ast = self.parse(module)
 
         mutated_modules = []
+        config.counter = 0
         for operator in operators:
+
+            # initialize global variables
+            config.mutated = False
+            config.nodes_to_remove = set()
+            config.nodes_to_potential = set()
+            config.node_pairs = {}
+            config.visited_nodes = set()
+            config.current_mutated_node = None
+            config.parent_dict = {}
 
             # make a copy of the original ast for mutation
             original_ast_copy = deepcopy(self.original_ast)
-
-            config.mutated = False
+            # print codegen.to_source(original_ast_copy)
 
             # mutate the original sut
             self.mutated_ast = self.mutate_bySingleOperator(original_ast_copy, operator)
             # print codegen.to_source(self.mutated_ast)
 
-            # generate a mutant module from mutated ast tree
-            if config.mutated:
+            while config.mutated:
+
+                # generate a mutant module from mutated ast tree
                 mutated_module = self.generate_mutant_module(self.mutated_ast, operator[1].name()+'_'+operator[0].__name__)
                 mutated_modules.append(mutated_module)
 
-                # todo: diff two ast
                 MuUtilities.make_diff(self.original_ast, self.mutated_ast, operator[1].name()+'_'+operator[0].__name__)
+
+                # recover
+                self.mutated_ast = self.rollback_mutation(self.mutated_ast, operator)
+                # print codegen.to_source(self.mutated_ast)
+
+                config.mutated = False
+                self.mutated_ast = self.mutate_bySingleOperator(self.mutated_ast, operator)
+                # print codegen.to_source(self.mutated_ast)
 
         return mutated_modules
 
-    def mutate_bySingleOperator(self, tree, operator):
+    def mutate_bySingleOperator(self, root, operator):
         """
         Mutate an abstract syntax tree by a single mutation operator
-        :param tree: the target module to mutate
+        :param root: the target module to mutate
         :param operator: pre-defined mutation operator
         :return: a mutated abstract syntax tree
         """
         self.operator = operator
 
-        ast.fix_missing_locations(tree)
+        ast.fix_missing_locations(root)
         # traverse the target ast tree and mutate interesting node
-        mutated_ast = self.visit(tree)
-        ast.fix_missing_locations(tree)
+        mutated_ast = self.visit(root)
+        ast.fix_missing_locations(root)
 
         return mutated_ast
+
+    def rollback_mutation(self, root, operator):
+        config.recovering = True
+        return self.mutate_bySingleOperator(root, operator)
 
     def generate_mutant_module(self, mutated_ast, module_shortname=""):
         """
@@ -105,6 +125,49 @@ class MutantGenerator(ast.NodeTransformer):
         except TypeError:
             print 'checkpoint'
         return mutant_module
+
+    def mutate_single_node(self, node, operator):
+        """
+        Mutate a single node by a specified operator
+        """
+        if node.__class__ is operator[0] or (operator[1] is StatementDeletion and node.__class__ is ast.Pass):
+            mutated_node = operator[1].mutate(node)
+            node = mutated_node
+
+        return node
+
+    def visit_node(self, node):
+        if node and not config.mutated:
+            for child in ast.iter_child_nodes(node):
+                config.parent_dict[child] = node
+            node = self.mutate_single_node(node, self.operator)
+
+            if node and not config.mutated:
+                self.dfs_visit(node)
+        return node
+
+    def recover_node(self, node):
+        if node and config.mutated and config.recovering:
+            if node == config.current_mutated_node:
+                if hasattr(node, 'lineno'):
+                    print str(node.lineno)
+                if node in config.parent_dict:
+                    parent = config.parent_dict[node]
+                else:
+                    print "KeyError in " + node.lineno
+                original_node = config.node_pairs[node]
+
+                del config.parent_dict[node]
+                del config.node_pairs[node]
+
+                node = original_node
+                config.parent_dict[original_node] = parent
+                config.visited_nodes.add(original_node)
+                config.recovering = False
+
+            else:
+                self.dfs_visit(node)
+        return node
 
     def dfs_visit(self, node):
         """
@@ -125,85 +188,206 @@ class MutantGenerator(ast.NodeTransformer):
 
         return wrapper
 
+    def visit_List(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Tuple(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Set(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Dict(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Name(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
     def visit_Num(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_Str(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_UAdd(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_USub(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_BitAnd(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_BitOr(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_BitXor(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_LShift(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_RShift(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_And(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_Or(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Eq(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_NotEq(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Lt(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Gt(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_LtE(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_GtE(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_Attribute(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_Compare(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_UnaryOp(self, node):
         """
         Visit and mutate a unary operation
         """
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_BinOp(self, node):
         """
         Visit and mutate a binary operation
         """
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Pass(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_BoolOp(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_If(self, node):
@@ -212,30 +396,44 @@ class MutantGenerator(ast.NodeTransformer):
         :param node:
         :return:
         """
-        if self.operator[1] is StatementDeletion:
-            for anode in node.body:
-                if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
-                    self.nodes_to_remove.add(anode)
-                elif anode.__class__ in [ast.Expr]:
-                    self.nodes_to_potential.add(anode)
-            node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
-        else:
-            node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            for child in ast.iter_child_nodes(node):
+                config.parent_dict[child] = node
+
+            if self.operator[1] is StatementDeletion:
+                for anode in node.body:
+                    if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call] and anode not in config.nodes_to_remove:
+                        config.nodes_to_remove.add(anode)
+                    elif anode.__class__ in [ast.Expr] and anode not in config.nodes_to_remove:
+                        config.nodes_to_potential.add(anode)
+                node = self.mutate_single_node(node, self.operator)
+            else:
+                node = self.mutate_single_node(node, self.operator)
+            if node and not config.mutated:
+                self.dfs_visit(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_Expr(self, node):
-        if self.operator[1] is StatementDeletion:
-            if node in self.nodes_to_remove:
-                node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
-            elif node in self.nodes_to_potential:
-                if node.value.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
-                    self.nodes_to_potential.remove(node)
-                    self.nodes_to_remove.add(node)
-                    node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
-        else:
-            node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            for child in ast.iter_child_nodes(node):
+                config.parent_dict[child] = node
+
+            if self.operator[1] is StatementDeletion:
+                if node in config.nodes_to_remove:
+                    node = self.mutate_single_node(node, self.operator)
+                elif node in config.nodes_to_potential:
+                    if node.value.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
+                        config.nodes_to_potential.remove(node)
+                        config.nodes_to_remove.add(node)
+                        node = self.mutate_single_node(node, self.operator)
+            else:
+                node = self.mutate_single_node(node, self.operator)
+            if node and not config.mutated:
+                self.dfs_visit(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_IfExp(self, node):
@@ -244,8 +442,10 @@ class MutantGenerator(ast.NodeTransformer):
         :param node:
         :return:
         """
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_Assert(self, node):
@@ -254,151 +454,221 @@ class MutantGenerator(ast.NodeTransformer):
         :param node:
         :return:
         """
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
-    def visit_For(self, node):
-        if self.operator[1] is StatementDeletion:
-            for anode in node.body:
-                if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
-                    self.nodes_to_remove.add(anode)
-                elif anode.__class__ in [ast.Expr]:
-                    self.nodes_to_potential.add(anode)
-            node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
-        else:
-            node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
-        return node
-
-    def visit_While(self, node):
-        if self.operator[1] is StatementDeletion:
-            for anode in node.body:
-                if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
-                    self.nodes_to_remove.add(anode)
-                elif anode.__class__ in [ast.Expr]:
-                    self.nodes_to_potential.add(anode)
-            node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
-        else:
-            node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
-        return node
-
-    def visit_Break(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
-        return node
-
-    def visit_Continue(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
-        return node
-
-    def visit_Raise(self, node):
-        if self.operator[1] is StatementDeletion:
-            if len(self.nodes_to_remove) > 0 and node in self.nodes_to_remove:
-                node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
-        else:
-            node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
-        return node
-
-    def visit_Assign(self, node):
-        if self.operator[1] is StatementDeletion:
-            if len(self.nodes_to_remove) > 0 and node in self.nodes_to_remove:
-                node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
-        else:
-            node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
-        return node
-
-    def visit_AugAssign(self, node):
-        if self.operator[1] is StatementDeletion:
-            if len(self.nodes_to_remove) > 0 and node in self.nodes_to_remove:
-                node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
-        else:
-            node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+    def visit_Index(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_Slice(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Subscript(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_For(self, node):
+        if node and not config.mutated:
+            for child in ast.iter_child_nodes(node):
+                config.parent_dict[child] = node
+
+            if self.operator[1] is StatementDeletion:
+                for anode in node.body:
+                    if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
+                        config.nodes_to_remove.add(anode)
+                    elif anode.__class__ in [ast.Expr]:
+                        config.nodes_to_potential.add(anode)
+                node = self.mutate_single_node(node, self.operator)
+            else:
+                node = self.mutate_single_node(node, self.operator)
+            if node and not config.mutated:
+                self.dfs_visit(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_While(self, node):
+        if node and not config.mutated:
+            for child in ast.iter_child_nodes(node):
+                config.parent_dict[child] = node
+
+            if self.operator[1] is StatementDeletion:
+                for anode in node.body:
+                    if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
+                        config.nodes_to_remove.add(anode)
+                    elif anode.__class__ in [ast.Expr]:
+                        config.nodes_to_potential.add(anode)
+                node = self.mutate_single_node(node, self.operator)
+            else:
+                node = self.mutate_single_node(node, self.operator)
+            if node and not config.mutated:
+                self.dfs_visit(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Break(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Continue(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Raise(self, node):
+        if node and not config.mutated:
+            for child in ast.iter_child_nodes(node):
+                config.parent_dict[child] = node
+
+            if self.operator[1] is StatementDeletion:
+                if len(config.nodes_to_remove) > 0 and node in config.nodes_to_remove:
+                    node = self.mutate_single_node(node, self.operator)
+            else:
+                node = self.mutate_single_node(node, self.operator)
+            if node and not config.mutated:
+                self.dfs_visit(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Assign(self, node):
+        if node and not config.mutated:
+            for child in ast.iter_child_nodes(node):
+                config.parent_dict[child] = node
+
+            if self.operator[1] is StatementDeletion:
+                if len(config.nodes_to_remove) > 0 and node in config.nodes_to_remove:
+                    node = self.mutate_single_node(node, self.operator)
+            else:
+                node = self.mutate_single_node(node, self.operator)
+            if node and not config.mutated:
+                self.dfs_visit(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_AugAssign(self, node):
+        if node and not config.mutated:
+            for child in ast.iter_child_nodes(node):
+                config.parent_dict[child] = node
+
+            if self.operator[1] is StatementDeletion:
+                if len(config.nodes_to_remove) > 0 and node in config.nodes_to_remove:
+                    node = self.mutate_single_node(node, self.operator)
+            else:
+                node = self.mutate_single_node(node, self.operator)
+            if node and not config.mutated:
+                self.dfs_visit(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Print(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_TryFinally(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        if node:
-            self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
-    # def visit_TryExcept(self, node):
-    #     node = self.mutate_single_node(node, self.operator)
-    #     if node:
-    #         self.dfs_visit(node)
-    #     return node
+    def visit_TryExcept(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
 
     def visit_ExceptHandler(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        if node:
-            self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Return(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_Call(self, node):
-        if self.operator[1] is StatementDeletion:
-            if len(self.nodes_to_remove) > 0 and node in self.nodes_to_remove:
-                node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
-        else:
-            node = self.mutate_single_node(node, self.operator)
-        if node:
-            self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_arguments(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Lambda(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
     def visit_FunctionDef(self, node):
-        if self.operator[1] is StatementDeletion:
-            for anode in node.body:
-                if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
-                    self.nodes_to_remove.add(anode)
-                elif anode.__class__ in [ast.Expr]:
-                    self.nodes_to_potential.add(anode)
-            node = self.mutate_single_node(node, self.operator, self.nodes_to_remove)
-        else:
+        if node and not config.mutated:
+            for child in ast.iter_child_nodes(node):
+                config.parent_dict[child] = node
+
+            if self.operator[1] is StatementDeletion:
+                for anode in node.body:
+                    if anode.__class__ in [ast.Raise, ast.Continue, ast.Break, ast.Assign, ast.AugAssign, ast.Call]:
+                        config.nodes_to_remove.add(anode)
+                    elif anode.__class__ in [ast.Expr]:
+                        config.nodes_to_potential.add(anode)
+
             node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+
+            if node and not config.mutated:
+                self.dfs_visit(node)
+                # print codegen.to_source(node)
+
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+
         return node
 
     def visit_ClassDef(self, node):
-        node = self.mutate_single_node(node, self.operator)
-        self.dfs_visit(node)
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
         return node
 
-    # def mutate_single_node(self, node, operator):
-    #     """
-    #     Mutate a single node by a specified operator
-    #     """
-    #     if node.__class__ is operator[0]:
-    #         # mutate
-    #         mutated_node = operator[1].mutate(node)
-    #
-    #         if config.mutated:
-    #             node = mutated_node
-    #
-    #     return node
 
-    def mutate_single_node(self, node, operator, nodes_to_remove=None):
-        """
-        Mutate a single node by a specified operator
-        """
-        if node.__class__ is operator[0]:
-            # mutate
-            if nodes_to_remove:
-                mutated_node = operator[1].mutate(node, nodes_to_remove)
-            else:
-                mutated_node = operator[1].mutate(node)
-
-            if config.mutated:
-                node = mutated_node
-
-        return node
 
 

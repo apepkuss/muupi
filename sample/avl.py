@@ -34,7 +34,7 @@ class AVLTree:
     def __init__(self, *args):
         self.node = None 
         self.height = -1  
-        self.balance = 0; 
+        self.balance = 0
         
         if len(args) == 1: 
             for i in args[0]: 

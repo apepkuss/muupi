@@ -68,31 +68,38 @@ class MuUtilities(object):
         """
         if not os.path.isdir('output'):
             os.mkdir(os.path.curdir + '/output')
-        dest_dir = os.path.curdir + '/output'
+        dest_dir = os.path.curdir + '/output/'
+        suffix = '_' + str(int(time.time()))
+        dest_dir += operator_name
+        while os.path.exists(dest_dir + suffix):
+            suffix = '_' + str(int(time.time()))
+        os.mkdir(dest_dir + suffix)
+        dest_dir += suffix
 
         # write the original code to a file
         original_code = codegen.to_source(node1)
-        filename = operator_name + "_original_" + ".py"
+        filename = operator_name + "_original" + ".py"
         path = os.path.join(dest_dir, filename)
         cls.write_to_file(path, original_code)
 
         # write the mutated code to a file
         mutated_code = codegen.to_source(node2)
-        filename = operator_name + "_mutant_" + ".py"
+        filename = operator_name + "_mutant" + ".py"
         path = os.path.join(dest_dir, filename)
         cls.write_to_file(path, mutated_code)
 
         # write the diff result to a file
-        d = Differ()
-        res = ''.join(list(d.compare(original_code, mutated_code)))
-        filename = operator_name + "_diff_" + ".py"
-        path = os.path.join(dest_dir, filename)
-        cls.write_to_file(path, res)
+        # d = Differ()
+        # res = ''.join(list(d.compare(original_code, mutated_code)))
+        # filename = operator_name + "_diff" + ".py"
+        # path = os.path.join(dest_dir, filename)
+        # cls.write_to_file(path, res)
 
     @classmethod
     def write_to_file(cls, filename, text):
         with open(filename, 'w') as sourcefile:
             sourcefile.write(text)
+        sourcefile.close()
 
     @classmethod
     def print_ast(cls, tree):

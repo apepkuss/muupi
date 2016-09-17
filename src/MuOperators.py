@@ -3,6 +3,7 @@ import config
 import copy
 import sys
 from MuUtilities import *
+from copy import deepcopy
 
 ##### for test ########
 from MuUtilities import *
@@ -47,37 +48,15 @@ class MutationOperator(object):
                 cls.mutation_operators.append((ast.AugAssign, AssignmentOperatorReplacement))
 
             if name == 'BCR':
-                # if ast.Break not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.Break] = [BreakContinueReplacement]
-                # elif BreakContinueReplacement not in cls.mutation_operators[ast.Break]:
-                #     cls.mutation_operators[ast.Break].append(BreakContinueReplacement)
-                #
-                # if ast.Continue not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.Continue] = [BreakContinueReplacement]
-                # elif BreakContinueReplacement not in cls.mutation_operators[ast.Continue]:
-                #     cls.mutation_operators[ast.Continue].append(BreakContinueReplacement)
-
                 cls.mutation_operators.append((ast.Break, BreakContinueReplacement))
                 cls.mutation_operators.append((ast.Continue, BreakContinueReplacement))
 
             if name == 'LOD':
-                # if ast.If not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.If] = [ConditionalOperatorDeletion]
-                # elif ConditionalOperatorDeletion not in cls.mutation_operators[ast.If]:
-                #     cls.mutation_operators[ast.If].append(ConditionalOperatorDeletion)
-
                 cls.mutation_operators.append((ast.UnaryOp, LogicalOperatorDeletion))
 
             if name == 'LOI':
-                # if ast.If not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.If] = [ConditionalOperatorInsertion]
-                # elif ConditionalOperatorInsertion not in cls.mutation_operators[ast.If]:
-                #     cls.mutation_operators[ast.If].append(ConditionalOperatorInsertion)
-
-                cls.mutation_operators.append((ast.If, LogicalOperatorInsertion))
-                cls.mutation_operators.append((ast.While, LogicalOperatorInsertion))
-                cls.mutation_operators.append((ast.IfExp, LogicalOperatorInsertion))
-                cls.mutation_operators.append((ast.Assert, LogicalOperatorInsertion))
+                cls.mutation_operators.append((ast.UnaryOp, LogicalOperatorInsertion))
+                cls.mutation_operators.append((ast.BoolOp, LogicalOperatorInsertion))
 
             if name == 'CRP':
                 # if ast.Assign not in cls.mutation_operators:
@@ -106,13 +85,9 @@ class MutationOperator(object):
                 cls.mutation_operators.append((ast.ExceptHandler, ExceptionSwallowing))
 
             if name == 'LCR':
-                # if ast.If not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.If] = [LogicalConnectorReplacement]
-                # elif LogicalConnectorReplacement not in cls.mutation_operators[ast.If]:
-                #     cls.mutation_operators[ast.If].append(LogicalConnectorReplacement)
+                cls.mutation_operators.append((ast.UnaryOp, LogicalConnectorReplacement))
+                cls.mutation_operators.append((ast.BoolOp, LogicalConnectorReplacement))
 
-                cls.mutation_operators.append((ast.And, LogicalConnectorReplacement))
-                cls.mutation_operators.append((ast.Or, LogicalConnectorReplacement))
 
             if name == 'BOD':
                 # if ast.UnaryOp not in cls.mutation_operators:
@@ -165,7 +140,13 @@ class MutationOperator(object):
                 # elif RelationalOperatorReplacement not in cls.mutation_operators[ast.Compare]:
                 #     cls.mutation_operators[ast.Compare].append(RelationalOperatorReplacement)
 
-                cls.mutation_operators.append((ast.Compare, ComparisonOperatorReplacement))
+                cls.mutation_operators.append((ast.Eq, ComparisonOperatorReplacement))
+                cls.mutation_operators.append((ast.NotEq, ComparisonOperatorReplacement))
+                cls.mutation_operators.append((ast.Lt, ComparisonOperatorReplacement))
+                cls.mutation_operators.append((ast.Gt, ComparisonOperatorReplacement))
+                cls.mutation_operators.append((ast.LtE, ComparisonOperatorReplacement))
+                cls.mutation_operators.append((ast.GtE, ComparisonOperatorReplacement))
+
 
             if name == 'SSIR':
                 # if ast.Slice not in cls.mutation_operators:
@@ -219,6 +200,7 @@ class MutationOperator(object):
                 cls.mutation_operators.append((ast.Expr, StatementDeletion))
                 cls.mutation_operators.append((ast.Assign, StatementDeletion))
                 cls.mutation_operators.append((ast.AugAssign, StatementDeletion))
+                cls.mutation_operators.append((ast.Pass, StatementDeletion))
 
         return cls.mutation_operators
 
@@ -265,10 +247,17 @@ class ArithmeticOperatorDeletion(MutationOperator):
         """
         mutate unary +, -
         """
-        if node.__class__ is ast.UnaryOp:
-            if node.op.__class__ is ast.USub or node.op.__class__ is ast.UAdd:
-                config.mutated = True
-                return node.operand
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.UnaryOp:
+                if node.op.__class__ is ast.USub or node.op.__class__ is ast.UAdd:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node = node.operand
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
 
         return node
 
@@ -285,65 +274,119 @@ class ArithmeticOperatorReplacement(MutationOperator):
             1. mathematical operators: +, -, *, /, %, **
             2. bitwise operators:  >>, <<, |, &, ^
         """
+        if node in config.node_pairs:
+            parent = config.parent_dict[node]
+            original_node = config.node_pairs[node]
+            parent.value = original_node
+            config.parent_dict[original_node] = parent
+            config.visited_nodes.add(original_node)
+            del config.parent_dict[node]
+            del config.node_pairs[node]
+            return original_node
 
-        if node.__class__ is ast.BinOp:
-            # mutate arithmetic +, -, *, /, %, pow(), >>, <<, |, &, ^
-            if node.op.__class__ is ast.Add:
-                try:
-                    # filter out the "+" being used to concatenate strings
-                    if node.left.__class__ is ast.Num or node.right.__class__ is ast.Num: # and \
-                    #         not (node.left.__class__ is ast.Call and hasattr(node.left.func, 'id') and node.left.func.id == 'str') and \
-                    #         not (node.right.__class__ is ast.Call and hasattr(node.right.func, 'id') and node.right.func.id == 'str'):
+        elif node not in config.visited_nodes:
+            if node.__class__ is ast.BinOp:
+                # mutate arithmetic +, -, *, /, %, pow(), >>, <<, |, &, ^
+                if node.op.__class__ is ast.Add:
+                    if node.left.__class__ not in [ast.Str, ast.List] and node.right.__class__ not in [ast.Str, ast.List]:
                         config.mutated = True
+                        original_node = deepcopy(node)
+                        if node in config.parent_dict:
+                            parent = config.parent_dict[node]
+                        else:
+                            print 'KeyError in ' + str(node.lineno)
+                        del config.parent_dict[node]
                         node.op = ast.Sub()
-                except AttributeError:
-                    print 'checkpoint'
-            elif node.op.__class__ is ast.Sub:
-                config.mutated = True
-                node.op = ast.Add()
-            elif node.op.__class__ is ast.Mult:
-                if not(node.left.__class__ is ast.Str or node.right.__class__ is ast.Str):
+                        config.parent_dict[node] = parent
+                        config.node_pairs[node] = original_node
+                        config.current_mutated_node = node
+
+                elif node.op.__class__ is ast.Sub:
                     config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node.op = ast.Add()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.op.__class__ is ast.Mult:
+                    if not(node.left.__class__ is ast.Str or node.right.__class__ is ast.Str):
+                        config.mutated = True
+                        original_node = deepcopy(node)
+                        parent = config.parent_dict[node]
+                        del config.parent_dict[node]
+                        node.op = ast.Div()
+                        config.parent_dict[node] = parent
+                        config.node_pairs[node] = original_node
+                        config.current_mutated_node = node
+
+                elif node.op.__class__ is ast.Div:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node.op = ast.Mult()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.op.__class__ is ast.FloorDiv:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
                     node.op = ast.Div()
-            elif node.op.__class__ is ast.Div:
-                config.mutated = True
-                node.op = ast.Mult()
-            elif node.op.__class__ is ast.FloorDiv:
-                config.mutated = True
-                node.op = ast.Div()
-            elif node.op.__class__ is ast.Mod:
-                # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                pass
-            elif node.op.__class__ is ast.Pow:
-                # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                pass
-            elif node.op.__class__ is ast.LShift:
-                # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                pass
-            elif node.op.__class__ is ast.RShift:
-                # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                pass
-            elif node.op.__class__ is ast.BitOr:
-                # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                pass
-            elif node.op.__class__ is ast.BitXor:
-                # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                pass
-            elif node.op.__class__ is ast.BitAnd:
-                # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                pass
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
 
-                # todo: try more binary operations
+                elif node.op.__class__ is ast.Mod:
+                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
+                    pass
+                elif node.op.__class__ is ast.Pow:
+                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
+                    pass
+                elif node.op.__class__ is ast.LShift:
+                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
+                    pass
+                elif node.op.__class__ is ast.RShift:
+                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
+                    pass
+                elif node.op.__class__ is ast.BitOr:
+                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
+                    pass
+                elif node.op.__class__ is ast.BitXor:
+                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
+                    pass
+                elif node.op.__class__ is ast.BitAnd:
+                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
+                    pass
 
-        elif node.__class__ is ast.UnaryOp:
-            if node.op.__class__ is ast.UAdd:
-                config.mutated = True
-                node.op = ast.USub()
-            elif node.op.__class__ is ast.USub:
-                config.mutated = True
-                node.op = ast.UAdd()
+                    # todo: try more binary operations
+            elif node.__class__ is ast.UnaryOp:
+                if node.op.__class__ is ast.UAdd:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node.op = ast.USub()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
 
-                # todo: try more unary operations
+                elif node.op.__class__ is ast.USub:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node.op = ast.UAdd()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                    # todo: try more unary operations
 
         return node
 
@@ -363,24 +406,60 @@ class AssignmentOperatorReplacement(MutationOperator):
             4. /= to *=
             5. //= to /=
         """
-        if node.__class__ is ast.AugAssign:
-            if node.op.__class__ is ast.Add:
-                if (node.value.__class__ is not ast.Str) and \
-                        not (node.value.__class__ is ast.Call and node.value.func.id == 'str'):
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.AugAssign:
+                if node.op.__class__ is ast.Add:
+                    if (node.value.__class__ is not ast.Str) and \
+                            not (node.value.__class__ is ast.Call and hasattr(node.value.func, 'id') and node.value.func.id == 'str'):
+                        config.mutated = True
+                        original_node = deepcopy(node)
+                        parent = config.parent_dict[node]
+                        del config.parent_dict[node]
+                        node.op = ast.Sub()
+                        config.parent_dict[node] = parent
+                        config.node_pairs[node] = original_node
+                        config.current_mutated_node = node
+
+                elif node.op.__class__ is ast.Sub:
                     config.mutated = True
-                    node.op = ast.Sub()
-            elif node.op.__class__ is ast.Sub:
-                config.mutated = True
-                node.op = ast.Add()
-            elif node.op.__class__ is ast.Mult:
-                config.mutated = True
-                node.op = ast.Div()
-            elif node.op.__class__ is ast.Div:
-                config.mutated = True
-                node.op = ast.Mult()
-            elif node.op.__class__ is ast.FloorDiv:
-                config.mutated = True
-                node.op = ast.Div()
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node.op = ast.Add()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.op.__class__ is ast.Mult:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node.op = ast.Div()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.op.__class__ is ast.Div:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node.op = ast.Mult()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.op.__class__ is ast.FloorDiv:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node.op = ast.Div()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
         return node
 
 
@@ -391,9 +470,17 @@ class BitwiseOperatorDeletion(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.UnaryOp and node.op.__class__ is ast.Invert:
-            config.mutated = True
-            return node.operand
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.UnaryOp and node.op.__class__ is ast.Invert:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node = node.operand
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
         return node
 
 
@@ -404,21 +491,57 @@ class BitwiseOperatorReplacement(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.BitAnd:
-            config.mutated = True
-            node = ast.BitOr()
-        elif node.__class__ is ast.BitOr:
-            config.mutated = True
-            node = ast.BitAnd()
-        elif node.__class__ is ast.BitXor:
-            config.mutated = True
-            node = ast.BitAnd()
-        elif node.__class__ is ast.LShift:
-            config.mutated = True
-            node = ast.RShift()
-        elif node.__class__ is ast.RShift:
-            config.mutated = True
-            node = ast.LShift()
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.BitAnd:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node = ast.BitOr()
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
+            elif node.__class__ is ast.BitOr:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node = ast.BitAnd()
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
+            elif node.__class__ is ast.BitXor:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node = ast.BitAnd()
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
+            elif node.__class__ is ast.LShift:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node = ast.RShift()
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
+            elif node.__class__ is ast.RShift:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node = ast.LShift()
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
         return node
 
 
@@ -434,12 +557,27 @@ class BreakContinueReplacement(MutationOperator):
             1. break to continue
             2. continue to break
         """
-        if node.__class__ is ast.Break:
-            config.mutated = True
-            node = ast.Continue()
-        elif node.__class__ is ast.Continue:
-            config.mutated = True
-            node = ast.Break()
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.Break:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node = ast.Continue()
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
+            elif node.__class__ is ast.Continue:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node = ast.Break()
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
         return node
 
 
@@ -450,12 +588,21 @@ class ConstantReplacement(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.Num:
-            config.mutated = True
-            node.n += 1
-        elif node.__class__ is ast.Str:
-            config.mutated = True
-            node.n = ''
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.Num:
+                config.mutated = True
+                original_node = deepcopy(node)
+                node.n += 1
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
+            elif node.__class__ is ast.Str:
+                config.mutated = True
+                original_node = deepcopy(node)
+                node.n = ''
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
         return node
 
 
@@ -469,9 +616,17 @@ class LogicalOperatorDeletion(MutationOperator):
         """
         remove 'not' operator
         """
-        if node.__class__ is ast.UnaryOp and node.op.__class__ is ast.Not:
-            config.mutated = True
-            node = node.operand
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.UnaryOp and node.op.__class__ is ast.Not:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node = node.operand
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
         return node
 
 
@@ -482,15 +637,31 @@ class LogicalOperatorInsertion(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.If \
-                or node.__class__ is ast.While \
-                or node.__class__ is ast.IfExp \
-                or node.__class__ is ast.Assert:
-            config.mutated = True
-            unary_op_node = ast.UnaryOp()
-            unary_op_node.op = ast.Not()
-            unary_op_node.operand = node.test
-            node.test = unary_op_node
+        if node not in config.visited_nodes:
+            if config.parent_dict[node].__class__ in [ast.If, ast.While, ast.IfExp, ast.Assert]:
+                if node.__class__ is ast.UnaryOp:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node = node.operand
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.__class__ is ast.BoolOp:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    unary_op_node = ast.UnaryOp()
+                    unary_op_node.op = ast.Not()
+                    unary_op_node.operand = node
+                    node = unary_op_node
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
         return node
 
 
@@ -501,12 +672,22 @@ class LogicalConnectorReplacement(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.And:
-            config.mutated = True
-            node = ast.Or()
-        elif node.__class__ is ast.Or:
-            config.mutated = True
-            node = ast.And()
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.BoolOp:
+                if node.op.__class__ is ast.And:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    node.op = ast.Or()
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.op.__class__ is ast.Or:
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    node.op = ast.And()
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
         return node
 
 
@@ -516,14 +697,22 @@ class StatementDeletion(MutationOperator):
         return "SMD"
 
     @classmethod
-    def mutate(cls, node, nodes_to_remove):
+    def mutate(cls, node):
         """
         Replace raise, break, continue with pass.
         """
-        if node.__class__ in [ast.Raise, ast.Assign, ast.AugAssign, ast.Call, ast.Expr] and node in nodes_to_remove:
-            nodes_to_remove.remove(node)
-            node = ast.Pass()
-            config.mutated = True
+        if node not in config.visited_nodes:
+            if node.__class__ in [ast.Raise, ast.Assign, ast.AugAssign, ast.Call, ast.Expr, ast.Pass] and node in config.nodes_to_remove:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                config.nodes_to_remove.remove(node)
+                node = ast.Pass()
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
         return node
 
 
@@ -548,9 +737,14 @@ class FinallyHandlerDeletion(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.TryFinally:
-            config.mutated = True
-            node.finalbody = [ast.Pass()]
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.TryFinally:
+                config.mutated = True
+                original_node = deepcopy(node)
+                node.finalbody = [ast.Pass()]
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
         return node
 
 
@@ -561,9 +755,14 @@ class ExceptionSwallowing(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.ExceptHandler:
-            config.mutated = True
-            node.body = [ast.Pass()]
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.ExceptHandler:
+                config.mutated = True
+                original_node = deepcopy(node)
+                node.body = [ast.Pass()]
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
         return node
 
 
@@ -574,26 +773,68 @@ class ComparisonOperatorReplacement(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.Compare and len(node.ops) > 0:
-            for i in xrange(len(node.ops)):
-                if node.ops[i].__class__ is ast.Eq:
+        if node not in config.visited_nodes:
+            if node.__class__ in [ast.Eq, ast.NotEq, ast.Lt, ast.Gt, ast.LtE, ast.GtE]:
+                if node.__class__ is ast.Eq:
                     config.mutated = True
-                    node.ops[i] = ast.NotEq()
-                elif node.ops[i].__class__ is ast.NotEq:
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node = ast.NotEq()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.__class__ is ast.NotEq:
                     config.mutated = True
-                    node.ops[i] = ast.Eq()
-                elif node.ops[i].__class__ is ast.Lt:
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node = ast.Eq()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.__class__ is ast.Lt:
                     config.mutated = True
-                    node.ops[i] = ast.Gt()
-                elif node.ops[i].__class__ is ast.Gt:
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node = ast.Gt()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.__class__ is ast.Gt:
                     config.mutated = True
-                    node.ops[i] = ast.Lt()
-                elif node.ops[i].__class__ is ast.LtE:
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node = ast.Lt()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.__class__ is ast.LtE:
                     config.mutated = True
-                    node.ops[i] = ast.GtE()
-                elif node.ops[i].__class__ is ast.GtE:
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node = ast.GtE()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
+                elif node.__class__ is ast.GtE:
                     config.mutated = True
-                    node.ops[i] = ast.LtE()
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node = ast.LtE()
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
         return node
 
 
@@ -604,9 +845,17 @@ class SliceStartIndexDeletion(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.Slice and node.lower is not None:
-            config.mutated = True
-            node.lower = None
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.Slice and node.lower is not None:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node.lower = None
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
         return node
 
 
@@ -617,9 +866,16 @@ class SliceEndIndexDeletion(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.Slice and node.upper is not None:
-            config.mutated = True
-            node.upper = None
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.Slice and node.lower is not None:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node.upper = None
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
         return node
 
 
@@ -630,9 +886,16 @@ class SliceStepIndexDeletion(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.Slice and node.step is not None:
-            config.mutated = True
-            node.step = None
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.Slice and node.lower is not None:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node.step = None
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
         return node
 
 
@@ -643,14 +906,16 @@ class OneIterationLoop(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-
-        if node.__class__ is ast.While:
-            config.mutated = True
-            node.body.append(ast.Break())
-
-        elif node.__class__ is ast.For:
-            config.mutated = True
-            node.body.append(ast.Break())
+        if node not in config.visited_nodes:
+            if node.__class__ in [ast.While, ast.For]:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node.body.append(ast.Break())
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
 
         return node
 
@@ -662,11 +927,19 @@ class ReverseIterationLoop(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.For and node.iter is not None:
-            config.mutated = True
-            mutated_node = ast.Call(func=ast.Name(id='reversed', ctx=ast.Load()), args=[node.iter], keywords=[],
-                                    starargs=None, kwargs=None)
-            node.iter = mutated_node
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.For and node.iter is not None:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                mutated_node = ast.Call(func=ast.Name(id='reversed', ctx=ast.Load()), args=[node.iter], keywords=[],
+                                        starargs=None, kwargs=None)
+                node.iter = mutated_node
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
         return node
 
 
@@ -677,11 +950,18 @@ class SelfVariableDeletion(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.Attribute:
-            if node.value.__class__ is ast.Name and node.value.id == 'self':
-                config.mutated = True
-                mutated_node = ast.Name(node.attr, node.ctx)
-                return mutated_node
+        if node not in config.visited_nodes:
+            if node.__class__ is ast.Attribute:
+                if node.value.__class__ is ast.Name and node.value.id == 'self':
+                    config.mutated = True
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+                    node = ast.Name(node.attr, node.ctx)
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+
         return node
 
 
@@ -692,13 +972,36 @@ class ZeroIterationLoop(MutationOperator):
 
     @classmethod
     def mutate(cls, node):
-        if node.__class__ is ast.For or node.__class__ is ast.While:
-            config.mutated = True
-            node.body = [ast.Break()] + node.body
+        if node not in config.visited_nodes:
+            if node.__class__ in [ast.For, ast.While]:
+                config.mutated = True
+                original_node = deepcopy(node)
+                parent = config.parent_dict[node]
+                del config.parent_dict[node]
+                node.body = [ast.Break()] + node.body
+                config.parent_dict[node] = parent
+                config.node_pairs[node] = original_node
+                config.current_mutated_node = node
+
         return node
 
 
-###################### todo: another 9 rules to be added ############################
+###################### todo: another 8 rules to be added ############################
+
+class DecoratorDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "DDL"
+
+    @classmethod
+    def mutate(cls, node):
+        if node not in config.node_pairs:
+            if node.__class__ is ast.FunctionDef and len(node.decorator_list) > 0:
+                config.mutated = True
+                config.node_pairs.add(node)
+                node.decorator_list = []
+        return node
+
 
 class ClassmethodDecoratorInsertion(MutationOperator):
     @classmethod
@@ -708,19 +1011,6 @@ class ClassmethodDecoratorInsertion(MutationOperator):
     @classmethod
     def mutate(cls, node):
         pass
-
-
-class DecoratorDeletion(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "DDL"
-
-    @classmethod
-    def mutate(cls, node):
-        if node.__class__ is ast.FunctionDef and len(node.decorator_list) > 0:
-            config.mutated = True
-            node.decorator_list = []
-        return node
 
 
 class HidingVariableDeletion(MutationOperator):

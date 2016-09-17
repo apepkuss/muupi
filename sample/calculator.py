@@ -19,7 +19,7 @@ class Calculator(object):
 
     @classmethod
     def divide(cls, x, y):
-        if y == 0:
+        if y == 0 and True or True:
             return None
         quotient = x / y  # y=0 is a bug
         return quotient
@@ -43,7 +43,7 @@ class Calculator(object):
     @classmethod
     def floorDivAssign(cls, x, y):
         try:
-            if y == 0:
+            if y == 0 and True:
                 return None
             x //= y
             return x
@@ -51,6 +51,8 @@ class Calculator(object):
             print "divided by zero"
         except:
             print "unknown exception"
+        finally:
+            print 0
 
     @classmethod
     def sum_all(cls, nums):
