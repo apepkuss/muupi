@@ -611,6 +611,35 @@ class MutantGenerator(ast.NodeTransformer):
             return self.recover_node(node)
         return node
 
+    # Comprehensions
+    def visit_ListComp(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_SetComp(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_GeneratorExp(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_DictComp(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
     def visit_Return(self, node):
         if node and not config.mutated:
             return self.visit_node(node)
