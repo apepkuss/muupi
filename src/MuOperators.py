@@ -518,7 +518,7 @@ class ConstantReplacement(MutationOperator):
             elif node.__class__ is ast.Str:
                 config.mutated = True
                 original_node = deepcopy(node)
-                node.n = ''
+                node.s = ''
                 config.node_pairs[node] = original_node
                 config.current_mutated_node = node
 
@@ -548,6 +548,7 @@ class ConstantDeletion(MutationOperator):
                     config.current_mutated_node = node
                     config.mutated = True
         return node
+
 
 class LogicalOperatorDeletion(MutationOperator):
     @classmethod
