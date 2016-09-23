@@ -7,6 +7,8 @@ from MuUtilities import *
 from copy import deepcopy
 from MuOperators import StatementDeletion
 
+from timethis import timefunc
+from timethis import timeblock
 
 class MutantGenerator(ast.NodeTransformer):
     def __init__(self):
@@ -39,6 +41,7 @@ class MutantGenerator(ast.NodeTransformer):
         assert original_ast is not None
         return original_ast
 
+    @timefunc
     def mutate(self, module, operators):
         """
         Mutate a target module with specified mutation operators

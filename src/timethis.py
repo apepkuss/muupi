@@ -10,7 +10,7 @@ def timefunc(func):
         start = time.clock()
         r = func(*args, **kwargs)
         end = time.clock()
-        print '{}.{}:{}'.format(func.__module, func.__name__, end-start)
+        print '{}.{}: {} seconds'.format(func.__module__, func.__name__, end-start)
         return r
     return wrapper
 
