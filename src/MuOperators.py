@@ -193,17 +193,7 @@ class ArithmeticOperatorReplacement(MutationOperator):
             1. mathematical operators: +, -, *, /, %, **
             2. bitwise operators:  >>, <<, |, &, ^
         """
-        if node in config.node_pairs:
-            parent = config.parent_dict[node]
-            original_node = config.node_pairs[node]
-            parent.value = original_node
-            config.parent_dict[original_node] = parent
-            config.visited_nodes.add(original_node)
-            del config.parent_dict[node]
-            del config.node_pairs[node]
-            return original_node
-
-        elif node not in config.visited_nodes:
+        if node not in config.visited_nodes:
             if node.__class__ is ast.BinOp:
                 # mutate arithmetic +, -, *, /, %, pow(), >>, <<, |, &, ^
                 if node.op.__class__ is ast.Add:
