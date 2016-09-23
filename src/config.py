@@ -1,3 +1,4 @@
+import ast
 
 # specify if some changes happened on the original module
 mutated = False
@@ -22,4 +23,7 @@ parent_dict = {}
 
 # save the number of output files
 counter = 0
+
+# list of arithmetic operators
+AOR_operators = [ast.Add, ast.Sub, ast.Mult, ast.Div]
 

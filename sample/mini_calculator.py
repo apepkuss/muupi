@@ -2,11 +2,29 @@
 
 class Calculator(object):
     @classmethod
-    def sum_of_collection(cls, nums, start, end, step):
-        res = 0
-        if len(nums) > 0:
-            for anum in nums[start:end:step]:
-                res += anum
-        return res
+    def add(cls, x, y):
+        sum = x + y
+        return sum
+
+    @classmethod
+    def subtract(cls, x, y):
+        diff = x - y
+        return diff
+
+    @classmethod
+    def multiply(cls, x, y):
+        product = x * y
+        return product
+
+    @classmethod
+    def divide(cls, x, y):
+        if y == 0 and True or True:
+            return None
+        quotient = x / y  # y=0 is a bug
+        return quotient
+
+    @classmethod
+    def negate(cls, x):
+        return -x
 
 

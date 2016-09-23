@@ -195,85 +195,44 @@ class ArithmeticOperatorReplacement(MutationOperator):
         """
         if node not in config.visited_nodes:
             if node.__class__ is ast.BinOp:
-                # mutate arithmetic +, -, *, /, %, pow(), >>, <<, |, &, ^
+
                 if node.op.__class__ is ast.Add:
-                    if node.left.__class__ not in [ast.Str, ast.List] and node.right.__class__ not in [ast.Str, ast.List]:
-                        config.mutated = True
-                        original_node = deepcopy(node)
-                        if node in config.parent_dict:
-                            parent = config.parent_dict[node]
-                        else:
-                            print 'KeyError in ' + str(node.lineno)
-                        del config.parent_dict[node]
-                        node.op = ast.Sub()
+                    if node.left.__class__ in [ast.Str, ast.List] or node.right.__class__ in [ast.Str, ast.List]:
+                        return node
+
+                if node.op.__class__ in config.AOR_operators:
+                    config.AOR_operators.remove(node.op.__class__)
+
+                while len(config.AOR_operators) > 0:
+
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+
+                    new_node = None
+                    node_type = config.AOR_operators.pop()
+                    if node_type is ast.Add:
+                        new_node = ast.Add()
+                    elif node_type is ast.Sub:
+                        new_node = ast.Sub()
+                    elif node_type is ast.Mult:
+                        new_node = ast.Mult()
+                    elif node_type is ast.Div:
+                        new_node = ast.Div()
+                    else:
+                        print "TypeError in AOR"
+                    if new_node:
+                        node.op = new_node
                         config.parent_dict[node] = parent
                         config.node_pairs[node] = original_node
                         config.current_mutated_node = node
-
-                elif node.op.__class__ is ast.Sub:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node.op = ast.Add()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
-
-                elif node.op.__class__ is ast.Mult:
-                    if not(node.left.__class__ is ast.Str or node.right.__class__ is ast.Str):
                         config.mutated = True
-                        original_node = deepcopy(node)
-                        parent = config.parent_dict[node]
-                        del config.parent_dict[node]
-                        node.op = ast.Div()
-                        config.parent_dict[node] = parent
-                        config.node_pairs[node] = original_node
-                        config.current_mutated_node = node
+                        return node
 
-                elif node.op.__class__ is ast.Div:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node.op = ast.Mult()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
+                if len(config.AOR_operators) == 0:
+                    config.AOR_operators = [ast.Add, ast.Sub, ast.Mult, ast.Div]
+                    config.visited_nodes.add(node)
 
-                elif node.op.__class__ is ast.FloorDiv:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node.op = ast.Div()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
-
-                elif node.op.__class__ is ast.Mod:
-                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                    pass
-                elif node.op.__class__ is ast.Pow:
-                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                    pass
-                elif node.op.__class__ is ast.LShift:
-                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                    pass
-                elif node.op.__class__ is ast.RShift:
-                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                    pass
-                elif node.op.__class__ is ast.BitOr:
-                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                    pass
-                elif node.op.__class__ is ast.BitXor:
-                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                    pass
-                elif node.op.__class__ is ast.BitAnd:
-                    # return ast.BinOp(left=node.left, op=ast.Div(), right=node.right)
-                    pass
-
-                    # todo: try more binary operations
             elif node.__class__ is ast.UnaryOp:
                 if node.op.__class__ is ast.UAdd:
                     config.mutated = True
