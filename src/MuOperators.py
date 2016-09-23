@@ -515,7 +515,7 @@ class ConstantReplacement(MutationOperator):
                 config.node_pairs[node] = original_node
                 config.current_mutated_node = node
 
-            elif node.__class__ is ast.Str:
+            elif node.__class__ is ast.Str and len(node.s) > 0:
                 config.mutated = True
                 original_node = deepcopy(node)
                 node.s = ''
