@@ -200,37 +200,39 @@ class ArithmeticOperatorReplacement(MutationOperator):
                     if node.left.__class__ in [ast.Str, ast.List] or node.right.__class__ in [ast.Str, ast.List]:
                         return node
 
-                if node.op.__class__ in config.AOR_operators:
-                    config.AOR_operators.remove(node.op.__class__)
+                if node.op.__class__ in config.arithmetic_operators:
+                    config.arithmetic_operators.remove(node.op.__class__)
 
-                while len(config.AOR_operators) > 0:
+                while len(config.arithmetic_operators) > 0:
 
                     original_node = deepcopy(node)
                     parent = config.parent_dict[node]
                     del config.parent_dict[node]
 
-                    new_node = None
-                    node_type = config.AOR_operators.pop()
-                    if node_type is ast.Add:
-                        new_node = ast.Add()
-                    elif node_type is ast.Sub:
-                        new_node = ast.Sub()
-                    elif node_type is ast.Mult:
-                        new_node = ast.Mult()
-                    elif node_type is ast.Div:
-                        new_node = ast.Div()
+                    op_node = None
+                    op_type = config.arithmetic_operators.pop()
+                    if op_type is ast.Add:
+                        op_node = ast.Add()
+                    elif op_type is ast.Sub:
+                        op_node = ast.Sub()
+                    elif op_type is ast.Mult:
+                        op_node = ast.Mult()
+                    elif op_type is ast.Div:
+                        op_node = ast.Div()
+                    elif op_type is ast.FloorDiv:
+                        op_node = ast.FloorDiv()
                     else:
                         print "TypeError in AOR"
-                    if new_node:
-                        node.op = new_node
+                    if op_node:
+                        node.op = op_node
                         config.parent_dict[node] = parent
                         config.node_pairs[node] = original_node
                         config.current_mutated_node = node
                         config.mutated = True
                         return node
 
-                if len(config.AOR_operators) == 0:
-                    config.AOR_operators = [ast.Add, ast.Sub, ast.Mult, ast.Div]
+                if len(config.arithmetic_operators) == 0:
+                    config.arithmetic_operators = [ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv]
                     config.visited_nodes.add(node)
 
             elif node.__class__ is ast.UnaryOp:
@@ -276,57 +278,45 @@ class AssignmentOperatorReplacement(MutationOperator):
         """
         if node not in config.visited_nodes:
             if node.__class__ is ast.AugAssign:
+
                 if node.op.__class__ is ast.Add:
-                    if (node.value.__class__ is not ast.Str) and \
-                            not (node.value.__class__ is ast.Call and hasattr(node.value.func, 'id') and node.value.func.id == 'str'):
-                        config.mutated = True
-                        original_node = deepcopy(node)
-                        parent = config.parent_dict[node]
-                        del config.parent_dict[node]
-                        node.op = ast.Sub()
+                    if node.value.__class__ is ast.Str and node.value.__class__ is ast.Call and hasattr(node.value.func, 'id') and node.value.func.id == 'str':
+                        return node
+
+                if node.op.__class__ in config.arithmetic_operators:
+                    config.arithmetic_operators.remove(node.op.__class__)
+
+                while len(config.arithmetic_operators) > 0:
+
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+
+                    op_node = None
+                    op_type = config.arithmetic_operators.pop()
+                    if op_type is ast.Add:
+                        op_node = ast.Add()
+                    elif op_type is ast.Sub:
+                        op_node = ast.Sub()
+                    elif op_type is ast.Mult:
+                        op_node = ast.Mult()
+                    elif op_type is ast.Div:
+                        op_node = ast.Div()
+                    elif op_type is ast.FloorDiv:
+                        op_node = ast.FloorDiv()
+                    else:
+                        print "TypeError in ASR"
+                    if op_node:
+                        node.op = op_node
                         config.parent_dict[node] = parent
                         config.node_pairs[node] = original_node
                         config.current_mutated_node = node
+                        config.mutated = True
+                        return node
 
-                elif node.op.__class__ is ast.Sub:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node.op = ast.Add()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
-
-                elif node.op.__class__ is ast.Mult:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node.op = ast.Div()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
-
-                elif node.op.__class__ is ast.Div:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node.op = ast.Mult()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
-
-                elif node.op.__class__ is ast.FloorDiv:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node.op = ast.Div()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
+                if len(config.arithmetic_operators) == 0:
+                    config.arithmetic_operators = [ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv]
+                    config.visited_nodes.add(node)
 
         return node
 

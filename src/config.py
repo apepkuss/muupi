@@ -24,6 +24,7 @@ parent_dict = {}
 # save the number of output files
 counter = 0
 
-# list of arithmetic operators
-AOR_operators = [ast.Add, ast.Sub, ast.Mult, ast.Div]
+# list of arithmetic operators for AOR, ASR
+arithmetic_operators = [ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv]
+
 
