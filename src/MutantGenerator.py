@@ -151,19 +151,29 @@ class MutantGenerator(ast.NodeTransformer):
             if node == config.current_mutated_node:
                 if hasattr(node, 'lineno'):
                     print str(node.lineno)
-                if node in config.parent_dict:
-                    parent = config.parent_dict[node]
+
+                if self.operator[1] is ConstantDeletion:
+                    original_node = config.node_pairs[node]
+                    node.elts.append(original_node)
+
+                    del config.node_pairs[node]
+                    config.visited_nodes.add(original_node)
+                    config.recovering = False
+
                 else:
-                    print "KeyError in " + node.lineno
-                original_node = config.node_pairs[node]
+                    if node in config.parent_dict:
+                        parent = config.parent_dict[node]
+                    else:
+                        print "KeyError in " + node.lineno
+                    original_node = config.node_pairs[node]
 
-                del config.parent_dict[node]
-                del config.node_pairs[node]
+                    del config.parent_dict[node]
+                    del config.node_pairs[node]
 
-                node = original_node
-                config.parent_dict[original_node] = parent
-                config.visited_nodes.add(original_node)
-                config.recovering = False
+                    node = original_node
+                    config.parent_dict[original_node] = parent
+                    config.visited_nodes.add(original_node)
+                    config.recovering = False
 
             else:
                 self.dfs_visit(node)
@@ -397,6 +407,34 @@ class MutantGenerator(ast.NodeTransformer):
         return node
 
     def visit_GtE(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_Is(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_IsNot(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_In(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
+    def visit_NotIn(self, node):
         if node and not config.mutated:
             return self.visit_node(node)
         elif node and config.mutated and config.recovering:

@@ -21,7 +21,7 @@ class MutationOperator(object):
     @classmethod
     def build(cls, names=None):
         if names is None or len(names) == 0:
-            names = ['AOD', 'AOR', 'ASR', 'BCR', 'LOD', 'LOI', 'CRP', \
+            names = ['AOD', 'AOR', 'ASR', 'BCR', 'LOD', 'LOI', 'CRP', 'CDL' \
                      'EXS', 'LCR', 'BOD', 'BOR', 'FHD', 'FCD', 'OIL', 'RIL', \
                      'COR', 'SSIR', 'SEIR', 'STIR', 'SVD', 'SMD', 'ZIL']
 
@@ -40,11 +40,6 @@ class MutationOperator(object):
                 cls.mutation_operators.append((ast.UnaryOp, ArithmeticOperatorReplacement))
 
             if name == 'ASR':
-                # if ast.AugAssign not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.AugAssign] = [AssignmentOperatorReplacement]
-                # elif AssignmentOperatorReplacement not in cls.mutation_operators[ast.AugAssign]:
-                #     cls.mutation_operators[ast.AugAssign].append(AssignmentOperatorReplacement)
-
                 cls.mutation_operators.append((ast.AugAssign, AssignmentOperatorReplacement))
 
             if name == 'BCR':
@@ -59,50 +54,24 @@ class MutationOperator(object):
                 cls.mutation_operators.append((ast.BoolOp, LogicalOperatorInsertion))
 
             if name == 'CRP':
-                # if ast.Assign not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.Assign] = [ConstantReplacement]
-                # elif ConstantReplacement not in cls.mutation_operators[ast.Assign]:
-                #     cls.mutation_operators[ast.Assign].append(ConstantReplacement)
-
-                # cls.mutation_operators.append((ast.Assign, ConstantReplacement))
                 cls.mutation_operators.append((ast.Num, ConstantReplacement))
                 cls.mutation_operators.append((ast.Str, ConstantReplacement))
 
-            # if name == 'EHD':
-            #     # if ast.ExceptHandler not in cls.mutation_operators:
-            #     #     cls.mutation_operators[ast.ExceptHandler] = [ExceptionHandlerDeletion]
-            #     # elif ExceptionHandlerDeletion not in cls.mutation_operators:
-            #     #     cls.mutation_operators[ast.ExceptHandler].append(ExceptionHandlerDeletion)
-            #
-            #     cls.mutation_operators.append((ast.ExceptHandler, ExceptionHandlerDeletion))
+            if name == 'CDL':
+                cls.mutation_operators.append((ast.List, ConstantDeletion))
+                # cls.mutation_operators.append((ast.Str, ConstantDeletion))
 
             if name == 'EXS':
-                # if ast.ExceptHandler not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.ExceptHandler] = [ExceptionSwallowing]
-                # elif ExceptionSwallowing not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.ExceptHandler].append(ExceptionSwallowing)
-
                 cls.mutation_operators.append((ast.ExceptHandler, ExceptionSwallowing))
 
             if name == 'LCR':
                 cls.mutation_operators.append((ast.UnaryOp, LogicalConnectorReplacement))
                 cls.mutation_operators.append((ast.BoolOp, LogicalConnectorReplacement))
 
-
             if name == 'BOD':
-                # if ast.UnaryOp not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.UnaryOp] = [LogicalOperatorDeletion]
-                # elif LogicalOperatorDeletion not in cls.mutation_operators[ast.UnaryOp]:
-                #     cls.mutation_operators[ast.UnaryOp].append(LogicalOperatorDeletion)
-
                 cls.mutation_operators.append((ast.UnaryOp, BitwiseOperatorDeletion))
 
             if name == 'BOR':
-                # if ast.BinOp not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.BinOp] = [LogicalOperatorReplacement]
-                # elif LogicalOperatorReplacement not in cls.mutation_operators[ast.BinOp]:
-                #     cls.mutation_operators[ast.BinOp].append(LogicalOperatorReplacement)
-
                 cls.mutation_operators.append((ast.BitAnd, BitwiseOperatorReplacement))
                 cls.mutation_operators.append((ast.BitOr, BitwiseOperatorReplacement))
                 cls.mutation_operators.append((ast.BitXor, BitwiseOperatorReplacement))
@@ -113,33 +82,13 @@ class MutationOperator(object):
                 cls.mutation_operators.append((ast.TryFinally, FinallyHandlerDeletion))
 
             if name == 'OIL':
-                # if ast.For not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.For] = [OneIterationLoop]
-                # elif OneIterationLoop not in cls.mutation_operators[ast.For]:
-                #     cls.mutation_operators[ast.For].append(OneIterationLoop)
-                #
-                # if ast.While not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.While] = [OneIterationLoop]
-                # elif OneIterationLoop not in cls.mutation_operators[ast.While]:
-                #     cls.mutation_operators[ast.While].append(OneIterationLoop)
-
                 cls.mutation_operators.append((ast.While, OneIterationLoop))
                 cls.mutation_operators.append((ast.For, OneIterationLoop))
 
             if name == 'RIL':
-                # if ast.For not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.For] = [ReverseIterationLoop]
-                # elif ReverseIterationLoop not in cls.mutation_operators[ast.For]:
-                #     cls.mutation_operators[ast.For].append(ReverseIterationLoop)
-
                 cls.mutation_operators.append((ast.For, ReverseIterationLoop))
 
             if name == 'COR':
-                # if ast.Compare not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.Compare] = [RelationalOperatorReplacement]
-                # elif RelationalOperatorReplacement not in cls.mutation_operators[ast.Compare]:
-                #     cls.mutation_operators[ast.Compare].append(RelationalOperatorReplacement)
-
                 cls.mutation_operators.append((ast.Eq, ComparisonOperatorReplacement))
                 cls.mutation_operators.append((ast.NotEq, ComparisonOperatorReplacement))
                 cls.mutation_operators.append((ast.Lt, ComparisonOperatorReplacement))
@@ -149,48 +98,18 @@ class MutationOperator(object):
 
 
             if name == 'SSIR':
-                # if ast.Slice not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.Slice] = [SliceStartIndexDeletion]
-                # elif SliceStartIndexDeletion not in cls.mutation_operators[ast.Slice]:
-                #     cls.mutation_operators[ast.Slice].append(SliceStartIndexDeletion)
-
                 cls.mutation_operators.append((ast.Slice, SliceStartIndexDeletion))
 
             if name == 'SEIR':
-                # if ast.Slice not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.Slice] = [SliceEndIndexDeletion]
-                # elif SliceEndIndexDeletion not in cls.mutation_operators[ast.Slice]:
-                #     cls.mutation_operators[ast.Slice].append(SliceEndIndexDeletion)
-
                 cls.mutation_operators.append((ast.Slice, SliceEndIndexDeletion))
 
             if name == 'STIR':
-                # if ast.Slice not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.Slice] = [SliceStepIndexDeletion]
-                # elif SliceStepIndexDeletion not in cls.mutation_operators[ast.Slice]:
-                #     cls.mutation_operators[ast.Slice].append(SliceStepIndexDeletion)
-
                 cls.mutation_operators.append((ast.Slice, SliceStepIndexDeletion))
 
             if name == 'SVD':
-                # if ast.Attribute not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.Attribute] = [SelfVariableDeletion]
-                # elif SelfVariableDeletion not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.Attribute].append(SelfVariableDeletion)
-
                 cls.mutation_operators.append((ast.Attribute, SelfVariableDeletion))
 
             if name == 'ZIL':
-                # if ast.For not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.For] = [ZeroIterationLoop]
-                # elif ZeroIterationLoop not in cls.mutation_operators[ast.For]:
-                #     cls.mutation_operators[ast.For].append(ZeroIterationLoop)
-                #
-                # if ast.While not in cls.mutation_operators:
-                #     cls.mutation_operators[ast.While] = [ZeroIterationLoop]
-                # elif ZeroIterationLoop not in cls.mutation_operators[ast.While]:
-                #     cls.mutation_operators[ast.While].append(ZeroIterationLoop)
-
                 cls.mutation_operators.append((ast.For, ZeroIterationLoop))
                 cls.mutation_operators.append((ast.While, ZeroIterationLoop))
 
@@ -605,6 +524,30 @@ class ConstantReplacement(MutationOperator):
 
         return node
 
+
+class ConstantDeletion(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "CDL"
+
+    @classmethod
+    def mutate(cls, node):
+        if node not in config.visited_nodes and node.__class__ in [ast.List, ast.Set, ast.Tuple]:
+            if len(node.elts) > 0:
+                i = 0
+                while i < len(node.elts):
+                    if node.elts[i] not in config.visited_nodes:
+                        break
+                    i += 1
+                if i == len(node.elts):
+                    config.visited_nodes.add(node)
+                else:
+                    original_node = node.elts[i]
+                    node.elts.remove(original_node)
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+                    config.mutated = True
+        return node
 
 class LogicalOperatorDeletion(MutationOperator):
     @classmethod
