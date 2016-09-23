@@ -21,7 +21,7 @@ class MutationOperator(object):
     @classmethod
     def build(cls, names=None):
         if names is None or len(names) == 0:
-            names = ['AOD', 'AOR', 'ASR', 'BCR', 'LOD', 'LOI', 'CRP', 'CDL' \
+            names = ['AOD', 'AOR', 'ASR', 'BCR', 'LOD', 'LOI', 'CRP', 'CDL', \
                      'EXS', 'LCR', 'BOD', 'BOR', 'FHD', 'FCD', 'OIL', 'RIL', \
                      'COR', 'SSIR', 'SEIR', 'STIR', 'SVD', 'SMD', 'ZIL']
 
