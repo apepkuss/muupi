@@ -811,7 +811,7 @@ class SliceEndIndexDeletion(MutationOperator):
     @classmethod
     def mutate(cls, node):
         if node not in config.visited_nodes:
-            if node.__class__ is ast.Slice and node.lower is not None:
+            if node.__class__ is ast.Slice and node.upper is not None:
                 config.mutated = True
                 original_node = deepcopy(node)
                 parent = config.parent_dict[node]
@@ -831,7 +831,7 @@ class SliceStepIndexDeletion(MutationOperator):
     @classmethod
     def mutate(cls, node):
         if node not in config.visited_nodes:
-            if node.__class__ is ast.Slice and node.lower is not None:
+            if node.__class__ is ast.Slice and node.step is not None:
                 config.mutated = True
                 original_node = deepcopy(node)
                 parent = config.parent_dict[node]
