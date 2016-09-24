@@ -59,32 +59,27 @@ class MuUtilities(object):
         return getattr(module, class_str)
 
     @classmethod
-    def make_diff(cls, node1, node2, operator_name):
+    def output(cls, node1, node2, operator_name):
         """
         Compare the original source code and mutant.
         :param node1:
         :param node2:
         :return:
         """
-        if not os.path.isdir('output'):
+        if not os.path.exists(os.path.curdir + '/output'):
             os.mkdir(os.path.curdir + '/output')
         dest_dir = os.path.curdir + '/output/'
-        suffix = '_' + str(int(time.time()))
-        dest_dir += operator_name
-        while os.path.exists(dest_dir + suffix):
-            suffix = '_' + str(int(time.time()))
-        os.mkdir(dest_dir + suffix)
-        dest_dir += suffix
 
-        # write the original code to a file
-        original_code = codegen.to_source(node1)
-        filename = operator_name + "_original" + ".py"
-        path = os.path.join(dest_dir, filename)
-        cls.write_to_file(path, original_code)
+        if not os.path.isfile(os.path.curdir + '/output/original.py'):
+            # write the original code to a file
+            original_code = codegen.to_source(node1)
+            filename = "original.py"
+            path = os.path.join(dest_dir, filename)
+            cls.write_to_file(path, original_code)
 
         # write the mutated code to a file
         mutated_code = codegen.to_source(node2)
-        filename = operator_name + "_mutant" + ".py"
+        filename = operator_name + "_mutant_" + str(int(time.time())) + ".py"
         path = os.path.join(dest_dir, filename)
         cls.write_to_file(path, mutated_code)
 
