@@ -29,4 +29,6 @@ arithmetic_operators = [ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv]
 
 comparison_operators = [ast.Eq, ast.NotEq, ast.Lt, ast.Gt, ast.LtE, ast.GtE]
 
+integer_operators = ['+1', '-1', '0', 'C+1', 'C-1']
+
 

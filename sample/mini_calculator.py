@@ -2,29 +2,19 @@
 
 class Calculator(object):
     @classmethod
-    def add(cls, x, y):
-        sum = x + y
-        return sum
+    def bit_left_shift(cls, x):
+        return x << 1
 
     @classmethod
-    def subtract(cls, x, y):
-        diff = x - y
-        return diff
+    def bit_right_shift(cls, x):
+        return x >> 1
 
     @classmethod
-    def multiply(cls, x, y):
-        product = x * y
-        return product
-
-    @classmethod
-    def divide(cls, x, y):
-        if y == 0 and True or True:
-            return None
-        quotient = x / y  # y=0 is a bug
-        return quotient
-
-    @classmethod
-    def negate(cls, x):
-        return -x
+    def sum_of_collection(cls, nums, start, end, step):
+        res = 0
+        if len(nums) > 0:
+            for anum in nums[start:end:step]:
+                res += anum
+        return res
 
 

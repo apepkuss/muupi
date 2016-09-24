@@ -448,11 +448,87 @@ class ConstantReplacement(MutationOperator):
     def mutate(cls, node):
         if node not in config.visited_nodes:
             if node.__class__ is ast.Num:
-                config.mutated = True
-                original_node = deepcopy(node)
-                node.n += 1
-                config.node_pairs[node] = original_node
-                config.current_mutated_node = node
+
+                while len(config.integer_operators) > 0:
+
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+
+                    if node.n == -1:
+                        if '-1' in config.integer_operators:
+                            config.integer_operators.remove('-1')
+                        if 'C+1' in config.integer_operators:
+                            config.integer_operators.remove('C+1')
+                    elif node.n == 0:
+                        if '0' in config.integer_operators:
+                            config.integer_operators.remove('0')
+                        if 'C+1' in config.integer_operators:
+                            config.integer_operators.remove('C+1')
+                        if 'C-1' in config.integer_operators:
+                            config.integer_operators.remove('C-1')
+                    elif node.n == 1:
+                        if '+1' in config.integer_operators:
+                            config.integer_operators.remove('+1')
+                        if 'C-1' in config.integer_operators:
+                            config.integer_operators.remove('C-1')
+
+                    op_type = config.integer_operators.pop()
+
+                    if node.n in [-1, 0, 1]:
+                        if node.n == -1:
+                            if op_type == '+1':
+                                node.n = 1
+                            elif op_type == '0':
+                                node.n = 0
+                            elif op_type == 'C-1':
+                                node.n -= 1
+                            else:
+                                print "TypeError in CRP"
+                                break
+                        elif node.n == 0:
+                            if op_type == '+1':
+                                node.n = 1
+                            elif op_type == '-1':
+                                node.n = -1
+                            else:
+                                print "TypeError in CRP"
+                                break
+                        else:
+                            if op_type == '-1':
+                                node.n = -1
+                            elif op_type == '0':
+                                node.n = 0
+                            elif op_type == 'C+1':
+                                node.n += 1
+                            else:
+                                print "TypeError in CRP"
+                                break
+
+                    else:
+                        if op_type == '+1':
+                            node.n = 1
+                        elif op_type == '-1':
+                            node.n = -1
+                        elif op_type == '0':
+                            node.n = 0
+                        elif op_type == 'C+1':
+                            node.n += 1
+                        elif op_type == 'C-1':
+                            node.n -= 1
+                        else:
+                            print "TypeError in CRP"
+                            break
+
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+                    config.mutated = True
+                    return node
+
+                if len(config.integer_operators) == 0:
+                    config.integer_operators = ['+1', '-1', '0', 'C+1', 'C-1']
+                    config.visited_nodes.add(node)
 
             elif node.__class__ is ast.Str and len(node.s) > 0:
                 config.mutated = True

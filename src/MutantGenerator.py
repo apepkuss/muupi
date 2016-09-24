@@ -58,7 +58,6 @@ class MutantGenerator(ast.NodeTransformer):
         for operator in operators:
 
             # initialize global variables
-            config.mutated = False
             config.nodes_to_remove = set()
             config.nodes_to_potential = set()
             config.node_pairs = {}
@@ -70,11 +69,16 @@ class MutantGenerator(ast.NodeTransformer):
             original_ast_copy = deepcopy(self.original_ast)
             # print codegen.to_source(original_ast_copy)
 
-            # mutate the original sut
-            self.mutated_ast = self.mutate_bySingleOperator(original_ast_copy, operator)
-            # print codegen.to_source(self.mutated_ast)
+            # while config.mutated:
+            while True:
+                config.mutated = False
 
-            while config.mutated:
+                # mutate the original sut
+                self.mutated_ast = self.mutate_bySingleOperator(original_ast_copy, operator)
+                # print codegen.to_source(self.mutated_ast)
+
+                if not config.mutated:
+                    break
 
                 # generate a mutant module from mutated ast tree
                 mutated_module = self.generate_mutant_module(self.mutated_ast, operator[1].name()+'_'+operator[0].__name__)
@@ -84,10 +88,6 @@ class MutantGenerator(ast.NodeTransformer):
 
                 # recover
                 self.mutated_ast = self.rollback_mutation(self.mutated_ast, operator)
-                # print codegen.to_source(self.mutated_ast)
-
-                config.mutated = False
-                self.mutated_ast = self.mutate_bySingleOperator(self.mutated_ast, operator)
                 # print codegen.to_source(self.mutated_ast)
 
         return mutated_modules
@@ -176,8 +176,8 @@ class MutantGenerator(ast.NodeTransformer):
                     node = original_node
                     config.parent_dict[original_node] = parent
 
-                    if self.operator[1] not in [ArithmeticOperatorReplacement, AssignmentOperatorReplacement, ComparisonOperatorReplacement] or \
-                            (self.operator[1] in [ArithmeticOperatorReplacement] and original_node.__class__ not in [ast.BinOp]):
+                    if self.operator[1] not in [ArithmeticOperatorReplacement, AssignmentOperatorReplacement, ComparisonOperatorReplacement, ConstantReplacement] or \
+                            (self.operator[1] in [ArithmeticOperatorReplacement, ConstantReplacement] and original_node.__class__ not in [ast.BinOp, ast.Num]):
                         config.visited_nodes.add(original_node)
                     config.recovering = False
 
