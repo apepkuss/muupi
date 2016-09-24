@@ -658,65 +658,40 @@ class ComparisonOperatorReplacement(MutationOperator):
     def mutate(cls, node):
         if node not in config.visited_nodes:
             if node.__class__ in [ast.Eq, ast.NotEq, ast.Lt, ast.Gt, ast.LtE, ast.GtE]:
-                if node.__class__ is ast.Eq:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node = ast.NotEq()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
+                if node.__class__ in config.comparison_operators:
+                    config.comparison_operators.remove(node.__class__)
 
-                elif node.__class__ is ast.NotEq:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node = ast.Eq()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
+                while len(config.comparison_operators) > 0:
 
-                elif node.__class__ is ast.Lt:
-                    config.mutated = True
                     original_node = deepcopy(node)
                     parent = config.parent_dict[node]
                     del config.parent_dict[node]
-                    node = ast.Gt()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
 
-                elif node.__class__ is ast.Gt:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node = ast.Lt()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
+                    node_type = config.comparison_operators.pop()
+                    if node_type is ast.Eq:
+                        node = ast.Eq()
+                    elif node_type is ast.NotEq:
+                        node = ast.NotEq()
+                    elif node_type is ast.Lt:
+                        node = ast.Lt()
+                    elif node_type is ast.Gt:
+                        node = ast.Gt()
+                    elif node_type is ast.LtE:
+                        node = ast.LtE()
+                    elif node_type is ast.GtE:
+                        node = ast.GtE()
+                    else:
+                        print "TypeError in AOR"
 
-                elif node.__class__ is ast.LtE:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node = ast.GtE()
                     config.parent_dict[node] = parent
                     config.node_pairs[node] = original_node
                     config.current_mutated_node = node
+                    config.mutated = True
+                    return node
 
-                elif node.__class__ is ast.GtE:
-                    config.mutated = True
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-                    node = ast.LtE()
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
+                if len(config.arithmetic_operators) == 0:
+                    config.arithmetic_operators = [ast.Eq, ast.NotEq, ast.Lt, ast.Gt, ast.LtE, ast.GtE]
+                    config.visited_nodes.add(node)
 
         return node
 

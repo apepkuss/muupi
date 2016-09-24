@@ -27,4 +27,6 @@ counter = 0
 # list of arithmetic operators for AOR, ASR
 arithmetic_operators = [ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv]
 
+comparison_operators = [ast.Eq, ast.NotEq, ast.Lt, ast.Gt, ast.LtE, ast.GtE]
+
 

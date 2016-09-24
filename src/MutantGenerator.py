@@ -176,7 +176,7 @@ class MutantGenerator(ast.NodeTransformer):
                     node = original_node
                     config.parent_dict[original_node] = parent
 
-                    if self.operator[1] not in [ArithmeticOperatorReplacement, AssignmentOperatorReplacement] or \
+                    if self.operator[1] not in [ArithmeticOperatorReplacement, AssignmentOperatorReplacement, ComparisonOperatorReplacement] or \
                             (self.operator[1] in [ArithmeticOperatorReplacement] and original_node.__class__ not in [ast.BinOp]):
                         config.visited_nodes.add(original_node)
                     config.recovering = False
