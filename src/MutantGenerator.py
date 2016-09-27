@@ -155,8 +155,9 @@ class MutantGenerator(ast.NodeTransformer):
                 if hasattr(node, 'lineno'):
                     print str(node.lineno)
 
+                original_node = config.node_pairs[node]
+
                 if self.operator[1] is ConstantDeletion:
-                    original_node = config.node_pairs[node]
                     node.elts.append(original_node)
 
                     del config.node_pairs[node]
@@ -168,7 +169,6 @@ class MutantGenerator(ast.NodeTransformer):
                         parent = config.parent_dict[node]
                     else:
                         print "KeyError in " + node.lineno
-                    original_node = config.node_pairs[node]
 
                     del config.parent_dict[node]
                     del config.node_pairs[node]
