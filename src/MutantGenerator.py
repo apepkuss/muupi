@@ -55,40 +55,41 @@ class MutantGenerator(ast.NodeTransformer):
 
         mutated_modules = []
         config.counter = 0
-        for operator in operators:
+        with timeblock('Time for mutation loop'):
+            for operator in operators:
 
-            # initialize global variables
-            config.nodes_to_remove = set()
-            config.nodes_to_potential = set()
-            config.node_pairs = {}
-            config.visited_nodes = set()
-            config.current_mutated_node = None
-            config.parent_dict = {}
+                # initialize global variables
+                config.nodes_to_remove = set()
+                config.nodes_to_potential = set()
+                config.node_pairs = {}
+                config.visited_nodes = set()
+                config.current_mutated_node = None
+                config.parent_dict = {}
 
-            # make a copy of the original ast for mutation
-            original_ast_copy = deepcopy(self.original_ast)
-            # print codegen.to_source(original_ast_copy)
+                # make a copy of the original ast for mutation
+                original_ast_copy = deepcopy(self.original_ast)
+                # print codegen.to_source(original_ast_copy)
 
-            # while config.mutated:
-            while True:
-                config.mutated = False
+                # while config.mutated:
+                while True:
+                    config.mutated = False
 
-                # mutate the original sut
-                self.mutated_ast = self.mutate_bySingleOperator(original_ast_copy, operator)
-                # print codegen.to_source(self.mutated_ast)
+                    # mutate the original sut
+                    self.mutated_ast = self.mutate_bySingleOperator(original_ast_copy, operator)
+                    # print codegen.to_source(self.mutated_ast)
 
-                if not config.mutated:
-                    break
+                    if not config.mutated:
+                        break
 
-                # generate a mutant module from mutated ast tree
-                mutated_module = self.generate_mutant_module(self.mutated_ast, operator[1].name()+'_'+operator[0].__name__)
-                mutated_modules.append(mutated_module)
+                    # generate a mutant module from mutated ast tree
+                    mutated_module = self.generate_mutant_module(self.mutated_ast, operator[1].name()+'_'+operator[0].__name__)
+                    mutated_modules.append(mutated_module)
 
-                MuUtilities.output(self.original_ast, self.mutated_ast, operator[1].name() + '_' + operator[0].__name__)
+                    MuUtilities.output(self.original_ast, self.mutated_ast, operator[1].name() + '_' + operator[0].__name__)
 
-                # recover
-                self.mutated_ast = self.rollback_mutation(self.mutated_ast, operator)
-                # print codegen.to_source(self.mutated_ast)
+                    # recover
+                    self.mutated_ast = self.rollback_mutation(self.mutated_ast, operator)
+                    # print codegen.to_source(self.mutated_ast)
 
         return mutated_modules
 

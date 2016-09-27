@@ -22,5 +22,5 @@ def timeblock(label):
         yield
     finally:
         end = time.clock()
-        print '{} : {}'.format(label, end-start)
+        print '{} : {} seconds'.format(label, end-start)
 
