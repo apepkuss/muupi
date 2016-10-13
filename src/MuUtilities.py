@@ -70,7 +70,7 @@ class MuUtilities(object):
             os.mkdir(os.path.curdir + '/output')
         dest_dir = os.path.curdir + '/output/'
 
-        if not os.path.isfile(os.path.curdir + '/output/original.py'):
+        if not os.path.isfile(dest_dir + 'original.py'):
             # write the original code to a file
             original_code = codegen.to_source(node1)
             filename = "original.py"
@@ -79,7 +79,12 @@ class MuUtilities(object):
 
         # write the mutated code to a file
         mutated_code = codegen.to_source(node2)
-        filename = operator_name + "_mutant_" + str(int(time.time())) + ".py"
+        filename = None
+        while True:
+            timestamp = str(int(time.time()))
+            filename = operator_name + "_mutant_" + timestamp + ".py"
+            if not os.path.isfile(dest_dir + filename):
+                break
         path = os.path.join(dest_dir, filename)
         cls.write_to_file(path, mutated_code)
 

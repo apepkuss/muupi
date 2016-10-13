@@ -2,19 +2,24 @@
 
 class Calculator(object):
     @classmethod
-    def bit_left_shift(cls, x):
-        return x << 1
+    def add(cls, x, y):
+        sum = x + y
+        return sum
 
     @classmethod
-    def bit_right_shift(cls, x):
-        return x >> 1
+    def floorDiv(cls, x, y):
+        try:
+            quotient = x // y
+            return quotient
+        except ZeroDivisionError:
+            print "divided by zero"
+        except:
+            print "unknown exception"
+        finally:
+            print 0
 
-    @classmethod
-    def sum_of_collection(cls, nums, start, end, step):
-        res = 0
-        if len(nums) > 0:
-            for anum in nums[start:end:step]:
-                res += anum
-        return res
+if __name__ == "__main__":
+    Calculator.floorDiv(5, 2)
+    Calculator.add(5, 5)
 
 
