@@ -186,5 +186,7 @@ method_name()
 if __name__ == "__main__":
     res = Calculator.floorDiv(5, 2)
     Calculator.add(5, 5)
+    nums = [4, 3, 1, 5, 2, 6]
+    Calculator.sum_all(nums)
     print res
 
