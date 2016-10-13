@@ -23,7 +23,7 @@ class MutationOperator(object):
         if names is None or len(names) == 0:
             names = ['AOD', 'AOR', 'ASR', 'BCR', 'LOD', 'LOI', 'CRP', 'CDL', \
                      'EXS', 'LCR', 'BOD', 'BOR', 'FHD', 'FCD', 'OIL', 'RIL', \
-                     'COR', 'SSIR', 'SEIR', 'STIR', 'SVD', 'SMD', 'ZIL']
+                     'COR', 'SSID', 'SEID', 'STID', 'SVD', 'SMD', 'ZIL']
 
         cls.mutation_operators = []
 
@@ -97,13 +97,13 @@ class MutationOperator(object):
                 cls.mutation_operators.append((ast.GtE, ComparisonOperatorReplacement))
 
 
-            if name == 'SSIR':
+            if name == 'SSID':
                 cls.mutation_operators.append((ast.Slice, SliceStartIndexDeletion))
 
-            if name == 'SEIR':
+            if name == 'SEID':
                 cls.mutation_operators.append((ast.Slice, SliceEndIndexDeletion))
 
-            if name == 'STIR':
+            if name == 'STID':
                 cls.mutation_operators.append((ast.Slice, SliceStepIndexDeletion))
 
             if name == 'SVD':
@@ -439,6 +439,53 @@ class BreakContinueReplacement(MutationOperator):
         return node
 
 
+class ComparisonOperatorReplacement(MutationOperator):
+    @classmethod
+    def name(cls):
+        return "COR"
+
+    @classmethod
+    def mutate(cls, node):
+        if node not in config.visited_nodes:
+            if node.__class__ in [ast.Eq, ast.NotEq, ast.Lt, ast.Gt, ast.LtE, ast.GtE]:
+                if node.__class__ in config.comparison_operators:
+                    config.comparison_operators.remove(node.__class__)
+
+                while len(config.comparison_operators) > 0:
+
+                    original_node = deepcopy(node)
+                    parent = config.parent_dict[node]
+                    del config.parent_dict[node]
+
+                    node_type = config.comparison_operators.pop()
+                    if node_type is ast.Eq:
+                        node = ast.Eq()
+                    elif node_type is ast.NotEq:
+                        node = ast.NotEq()
+                    elif node_type is ast.Lt:
+                        node = ast.Lt()
+                    elif node_type is ast.Gt:
+                        node = ast.Gt()
+                    elif node_type is ast.LtE:
+                        node = ast.LtE()
+                    elif node_type is ast.GtE:
+                        node = ast.GtE()
+                    else:
+                        print "TypeError in AOR"
+
+                    config.parent_dict[node] = parent
+                    config.node_pairs[node] = original_node
+                    config.current_mutated_node = node
+                    config.mutated = True
+                    return node
+
+                if len(config.arithmetic_operators) == 0:
+                    config.arithmetic_operators = [ast.Eq, ast.NotEq, ast.Lt, ast.Gt, ast.LtE, ast.GtE]
+                    config.visited_nodes.add(node)
+
+        return node
+
+
 class ConstantReplacement(MutationOperator):
     @classmethod
     def name(cls):
@@ -725,57 +772,10 @@ class ExceptionSwallowing(MutationOperator):
         return node
 
 
-class ComparisonOperatorReplacement(MutationOperator):
-    @classmethod
-    def name(cls):
-        return "COR"
-
-    @classmethod
-    def mutate(cls, node):
-        if node not in config.visited_nodes:
-            if node.__class__ in [ast.Eq, ast.NotEq, ast.Lt, ast.Gt, ast.LtE, ast.GtE]:
-                if node.__class__ in config.comparison_operators:
-                    config.comparison_operators.remove(node.__class__)
-
-                while len(config.comparison_operators) > 0:
-
-                    original_node = deepcopy(node)
-                    parent = config.parent_dict[node]
-                    del config.parent_dict[node]
-
-                    node_type = config.comparison_operators.pop()
-                    if node_type is ast.Eq:
-                        node = ast.Eq()
-                    elif node_type is ast.NotEq:
-                        node = ast.NotEq()
-                    elif node_type is ast.Lt:
-                        node = ast.Lt()
-                    elif node_type is ast.Gt:
-                        node = ast.Gt()
-                    elif node_type is ast.LtE:
-                        node = ast.LtE()
-                    elif node_type is ast.GtE:
-                        node = ast.GtE()
-                    else:
-                        print "TypeError in AOR"
-
-                    config.parent_dict[node] = parent
-                    config.node_pairs[node] = original_node
-                    config.current_mutated_node = node
-                    config.mutated = True
-                    return node
-
-                if len(config.arithmetic_operators) == 0:
-                    config.arithmetic_operators = [ast.Eq, ast.NotEq, ast.Lt, ast.Gt, ast.LtE, ast.GtE]
-                    config.visited_nodes.add(node)
-
-        return node
-
-
 class SliceStartIndexDeletion(MutationOperator):
     @classmethod
     def name(cls):
-        return "SSIR"
+        return "SSID"
 
     @classmethod
     def mutate(cls, node):
@@ -796,7 +796,7 @@ class SliceStartIndexDeletion(MutationOperator):
 class SliceEndIndexDeletion(MutationOperator):
     @classmethod
     def name(cls):
-        return "SEIR"
+        return "SEID"
 
     @classmethod
     def mutate(cls, node):
@@ -816,7 +816,7 @@ class SliceEndIndexDeletion(MutationOperator):
 class SliceStepIndexDeletion(MutationOperator):
     @classmethod
     def name(cls):
-        return "STIR"
+        return "STID"
 
     @classmethod
     def mutate(cls, node):
