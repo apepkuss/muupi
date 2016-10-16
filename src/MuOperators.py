@@ -269,12 +269,7 @@ class AssignmentOperatorReplacement(MutationOperator):
     @classmethod
     def mutate(cls, node):
         """
-        mutate assignment operator
-            1. += to -=
-            2. -= to +=
-            3. *= to /=
-            4. /= to *=
-            5. //= to /=
+        mutate augmented assignment operators: +=, -=, *=, /=, //=
         """
         if node not in config.visited_nodes:
             if node.__class__ is ast.AugAssign:
