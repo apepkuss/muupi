@@ -703,7 +703,7 @@ class StatementDeletion(MutationOperator):
         Replace raise, break, continue with pass.
         """
         if node not in config.visited_nodes:
-            if node.__class__ in [ast.Raise, ast.Assign, ast.AugAssign, ast.Call, ast.Expr, ast.Pass] and node in config.nodes_to_remove:
+            if node.__class__ in [ast.Raise, ast.Assign, ast.AugAssign, ast.Call, ast.Expr] and node in config.nodes_to_remove:
                 config.mutated = True
                 original_node = deepcopy(node)
                 parent = config.parent_dict[node]
