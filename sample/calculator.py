@@ -38,7 +38,7 @@ class Calculator(object):
         except:
             print "unknown exception"
         finally:
-            print 0
+            print "finally handler"
 
     @classmethod
     def floorDivAssign(cls, x, y):
@@ -52,7 +52,7 @@ class Calculator(object):
         except:
             print "unknown exception"
         finally:
-            print 0
+            print "finally handler"
 
     @classmethod
     def sum_all(cls, nums):
