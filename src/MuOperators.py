@@ -156,6 +156,8 @@ class MutationOperator(object):
         return res
 
 
+###################### 22 mutation operators available ############################
+
 class ArithmeticOperatorDeletion(MutationOperator):
     @classmethod
     def name(cls):
