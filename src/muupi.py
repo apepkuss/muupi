@@ -133,6 +133,7 @@ if __name__ == "__main__":
                     suite_module_fullname = config.tsmodule_fullname
                     suite_module_path = config.tsmodule_path
 
+                    # Load test suite module
                     suite_module = MuUtilities.load_module(suite_module_fullname, suite_module_path)
                     print "Done.\n"
 
