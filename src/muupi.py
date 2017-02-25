@@ -17,7 +17,7 @@ def parse_args():
                         help='The path of source code of module under test.')
     # parser.add_argument('-t', '--tsmodule-fullname', type=str, default=None,
     #                     help='Full name of test suite module.')
-    # parser.add_argument('-P', '--tsmodule-path', type=str, default=None,
+    # parser.add_argument('-T', '--tsmodule-path', type=str, default=None,
     #                     help='The path of source code of test suite module.')
     parser.add_argument('-g', '--generator', type=str, default=None,
                         help='Specify a generator.')
