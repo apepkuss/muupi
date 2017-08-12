@@ -455,6 +455,13 @@ class MutantGenerator(ast.NodeTransformer):
             return self.recover_node(node)
         return node
 
+    def visit_keyword(self, node):
+        if node and not config.mutated:
+            return self.visit_node(node)
+        elif node and config.mutated and config.recovering:
+            return self.recover_node(node)
+        return node
+
     def visit_IfExp(self, node):
         """
         Visit and mutate if expression
