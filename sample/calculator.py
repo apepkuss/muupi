@@ -29,6 +29,13 @@ class Calculator(object):
         return -x
 
     @classmethod
+    def test_op1(cls):
+        xx = 2
+        yy = 3
+        z = cls.multiply(x=not xx & yy, y=0)
+        return z
+
+    @classmethod
     def floorDiv(cls, x, y):
         try:
             quotient = x // y
@@ -127,45 +134,41 @@ class Calculator(object):
 
 class ScientificCalculator(Calculator):
 
-    @classmethod
-    def add(cls, x, y):
+    def add(self, x, y):
         """
         Override add function defined in Calculator
         :param x:
         :param y:
         :return:
         """
-        pass
+        return x + y
 
-    @classmethod
-    def subtract(cls, x, y):
+    def subtract(self, x, y):
         """
         Override subtract function defined in Calculator
         :param x:
         :param y:
         :return:
         """
-        pass
+        return x - y
 
-    @classmethod
-    def multiply(cls, x, y):
+    def multiply(self, x, y):
         """
         Override multiply function defined in Calculator
         :param x:
         :param y:
         :return:
         """
-        pass
+        return x * y
 
-    @classmethod
-    def divide(cls, x, y):
+    def divide(self, x, y):
         """
         Override divide function defined in Calculator
         :param x:
         :param y:
         :return:
         """
-        pass
+        return x / y
 
 
 class CalculatorTest(object):
@@ -178,15 +181,18 @@ class CalculatorTest(object):
         return self.name
 
 
-def method_name():
-    print 'this is a method'
-
-method_name()
-
+# def method_name():
+#     print 'this is a method'
+#
+# method_name()
+#
 if __name__ == "__main__":
     res = Calculator.floorDiv(5, 2)
     Calculator.add(5, 5)
     nums = [4, 3, 1, 5, 2, 6]
     Calculator.sum_all(nums)
     print res
+
+    sc = ScientificCalculator()
+    print sc.add(5, 5)
 
