@@ -356,6 +356,7 @@ class SourceGenerator(NodeVisitor):
                 self.write(' from ')
                 self.visit(node.cause)
         elif hasattr(node, 'type') and node.type is not None:
+            self.write(' ')
             self.visit(node.type)
             if node.inst is not None:
                 self.write(', ')
