@@ -6,6 +6,8 @@ import time
 import config
 import traceback
 
+import astor
+
 from MuOperators import *
 from MuTester import *
 from copy import deepcopy
@@ -72,13 +74,15 @@ class MuUtilities(object):
 
         if not os.path.isfile(dest_dir + 'original.py'):
             # write the original code to a file
-            original_code = codegen.to_source(node1)
+            # original_code = codegen.to_source(node1)
+            original_code = astor.to_source(node1, add_line_information=True)
             filename = "original.py"
             path = os.path.join(dest_dir, filename)
             cls.write_to_file(path, original_code)
 
         # write the mutated code to a file
-        mutated_code = codegen.to_source(node2)
+        # mutated_code = codegen.to_source(node2)
+        mutated_code = astor.to_source(node2, add_line_information=True)
         filename = None
         while True:
             timestamp = str(int(time.time()))
